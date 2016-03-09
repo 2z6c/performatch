@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <title>ナナシス パフォーマッチシミュレータ</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta charset="UTF-8">
+    <meta name="keywords" content="ナナシス,Tokyo 7th シスターズ,t7s,パフォーマッチ">
+    <meta name="description" content="ナナシスの『パフォーマッチ』イベントで勝率の高いユニットの選び方をシミュレートするアプリ">
+    <meta name="author" content="Nisaac" href="https://twitter.com/NisaacFuri">
+    <!-- OGP -->
+    <meta property="og:url" content="">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="ナナシス パフォーマッチシミュレータ">
+    <meta property="og:description" content="ナナシスの『パフォーマッチ』イベントで勝率の高いユニットの選び方を計算するアプリ">
+    <!-- /OGP -->
+    <!-- favicon -->
+    <!--link rel="icon" href="favicon.ico"-->
+    <link href='https://fonts.googleapis.com/css?family=Play' rel='stylesheet' type='text/css'>
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" type="text/css" href="t7s.css">
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+    <script src="t7s.js"></script>
+  </head>
+  <body>
+    <div id="main-contents">
+    <h1>ナナシス パフォーマッチシミュレータ</h1>
+    <section id="unit-area">
+      <div id="unit-editor">
+        <div id="you" class="team">
+          <div class="unit-panel">
+            <div id="save-slot">
+              <h3>ユニットデータ</h3>
+            </div>
+          </div>
+          <table class="unit">
+            <caption>YOU</caption>
+            <tbody>
+              <tr><td></td><td></td><td></td></tr>
+              <tr><td></td><td></td><td></td></tr>
+              <tr><td></td><td></td><td></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="control">
+          <a id="VS" class="button">VS</a>
+          <a id="config-button" class="button">設定</a>
+        </div>
+        <div id="rival" class="team">
+          <table class="unit">
+            <caption>RIVAL</caption>
+            <tbody>
+              <tr><td></td><td></td><td></td></tr>
+              <tr><td></td><td></td><td></td></tr>
+              <tr><td></td><td></td><td></td></tr>
+            </tbody>
+          </table>
+          <div id="rival-template" class="unit-panel">
+            <h3>テンプレート編成</h3>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div id="result-wrapper">
+    <section id="result">
+      <h2>結果</h2>
+      <table id="result-table">
+        <thead>
+          <tr>
+            <th rowspan="2" class="rank">#</th>
+            <th colspan="9">順番</th>
+            <th rowspan="2" class="rate">勝率</th>
+            <th rowspan="2" class="util">コピー</th>
+          </tr>
+          <tr>
+            <td colspan=3 class="result-unit">1st Unit</td>
+            <td colspan=3 class="result-unit">2nd Unit</td>
+            <td colspan=3 class="result-unit">3rd Unit</td>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+    <section id="known">
+      <h2>確定メンバー</h2>
+      <a id="reset-all" class="button">結果と固定枠をリセット</a>
+      <div class="known-unit template">
+        <div class="unit-caption">1st Unit</span></div>
+        <table class="known-table">
+          <tbody>
+            <tr class="you used-unit">
+              <th>YOU</th><td></td><td></td><td></td><td class="reset-cell"></td>
+            </tr>
+            <tr class="rival used-unit">
+              <th>RIVAL</th><td></td><td></td><td></td><td class="reset-cell"></td>
+            </tr>
+          </tbody>
+        </table>  
+      </div>
+    </section>
+    </div>
+    <section id="usage">
+      <h2>使い方</h2>
+      <ul class="explanation">
+        <li>上のユニット編成欄で自分と相手のユニット属性をそれぞれ選択します。<br>(背景クリックでチーム属性も変更)</li>
+        <li>[VS]ボタンを押すと計算が開始され、勝率が高い順に並べられたユニットの組み合わせが表示されます。</li>
+        <li>確定欄に1戦目の結果やスパイコニーさんの偵察結果を入れると精度が上がります。</li>
+        <li>各ユニットの確定欄を埋めるとシミュレートされた勝敗が右上に表示されます。<br>実際の勝敗結果と異なる場合はクリックすることで切り替えられます。</li>
+        <li>あくまで近似計算であり、全く同じ並びでも勝敗結果が実際のものと異なる場合があります。<br>ご利用は自己責任で。</li>
+        <li>マシンスペック次第で計算に時間がかかります。待ってください。</li>
+        <li id="unable-js">javascriptを有効にしてください。</li>
+        <li>【推奨ブラウザ】 Edge12~ / FF44~ / CH48~,OP35~ </li>
+      </ul>
+    </section>
+    <section id="method">
+      <h2>しくみ</h2>
+      計算のため以下の単純化をしています。
+      <ul class="explanation">
+        <li>パラメータ数値は無視</li>
+        <li>属性が有利なら勝ち</li>
+        <li>属性優劣がなければプレイヤー属性と一致している方が勝ち</li>
+        <li>最下位ボーナスが適用されているなら勝ち</li>
+        <li>それでも優劣がつかなければ引き分け</li>
+        <li>相手ユニットの取り得る全ての組合せについて勝敗判定をチェックし勝率を計算</li>
+        <li>自分の3人ユニット内での順序は勝率計算に影響なし(指定欄で指定した場合を除く)</li>
+      </ul>
+    </section>
+    </div>
+    <div id="overlay">
+      <div class="config" id="config">
+        <div id="close-config">×</div>
+      </div>
+    </div>
+    <div id="progress"><div id="bar"></div></div>
+    <div id="message">
+    </div>
+    <footer>
+      <!--a href="https://twitter.com/share" class="twitter-share-button" data-lang="ja">ツイート</a>
+      <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script-->
+      ©2016 <a href="https://twitter.com/NisaacFuri">@NisaacFuri</a>
+    </footer>
+  </body>
+</html>
+

@@ -1,0 +1,558 @@
+@charset "UTF-8";
+@import "compass";
+
+$orange: #ffa800;
+$blue: #0babf6;
+$lightblue: #50c2f8;
+$cyan: #8ff5fe;
+$darkcyan: #00c3dd;
+$magenta: #ff4873;
+$text-magenta: #f228ab;
+
+$type: Vo Va Mo Pl Da NT;
+
+$Vo: #ff85d1;
+$Va: #bd71fd;
+$Mo: #29b314;
+$Pl: #ff9e03;
+$Da: #1998fd;
+
+$type-color: $Vo $Va $Mo $Pl $Da;
+
+@mixin outline($color) {
+  text-shadow: 0 1px 0 $color, 0 -1px 0 $color, 1px 0 0 $color, -1px 0 0 $color;
+}
+
+body {
+  margin: 0;
+  font-family: 'ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ',Meiryo,'ＭＳ Ｐゴシック','MS PGothic',sans-serif;
+  color: #4c4c4c;
+}
+
+h1 {
+  color: $blue;
+}
+
+#main-contents {
+  width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-bottom: 30px;
+}
+
+.template {
+  display: none;
+}
+
+.button, .idol, .known-table {
+  @include user-select( none );
+}
+
+.team {
+  display: flex;
+}
+
+.unit-panel {
+  width: 120px;
+  padding: 3px;
+}
+
+#unit-editor {
+  display: flex;
+  margin: auto;
+  justify-content: center;
+  align-items: center;
+}
+
+.unit {
+  td {
+    border-width: 2px;
+    border-style: solid;
+    width: 36px;
+    height: 36px;
+    text-align: center;
+    border-radius: 5px;
+  }
+  caption, td {
+    cursor: pointer;
+  }
+}
+
+.idol {
+  width: 24px;
+  height: 24px;
+  border: 1px solid $lightblue;
+  background: $cyan;
+  text-align: center;
+}
+
+%type {
+  color: #fff;
+  font-family: 'Play', sans-serif;
+  font-weight: bold;
+  @include user-select( none );
+}
+
+@for $i from 1 through 5 {
+  .#{nth($type,$i)} {
+    @extend %type;
+    background: nth( $type-color, $i );
+    border-color: darken( nth($type-color, $i ), 15%);
+    &:hover,
+    &.selecting {
+      background: lighten( nth( $type-color, $i ), 5%);
+    }
+    caption {
+      background: darken( nth($type-color, $i ), 15%);
+    }
+  }
+}
+
+.NT {
+  @extend %type;
+  background: #c6c6c6;
+  border-color: #888888;
+  &:hover, &.selecting {
+    background: #888888;
+  }
+}
+
+/* タイプ選択メニュー */
+.type-select {
+  position: absolute;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  animation: spread .15s ease-out;
+}
+
+@keyframes spread {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+
+.dispose {
+  animation: dispose .15s ease-out;
+  transform: scale(0);
+  opacity: 0;
+}
+
+@keyframes dispose {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+%psude {
+  content: '';
+  position: absolute;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-sizing: border-box;
+  pointer-events: none;
+}
+  
+.type-option {
+  position: absolute;
+  a {
+    margin: 0;
+    border-width: 2px;
+    border-style: solid;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0;
+    box-sizing: border-box;
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    line-height: 24px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  $r: 30px;
+  @for $i from 1 through 5 {
+    &:nth-child(#{$i}) {
+      top:- cos( ($i - 1) * 72deg ) * $r;
+      left: sin( ($i - 1) * 72deg ) * $r;
+    }
+  }
+  &:nth-child(6) {
+    top: $r * 2;
+    left: 0;
+  }
+  &:hover {
+    border-color: #3fa9f5;
+    &:before {
+      background: rgba(63, 169, 245, 0.5);
+    }
+  }
+  &:before {
+    @extend %psude;
+    background: rgba(255, 255, 255, 0.4);
+    width: 36px;
+    height: 36px;
+  }
+  &:after {
+    @extend %psude;
+    width: 32px;
+    height: 32px;
+    border-style: dashed;
+    animation: spin 10s linear infinite;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: translate(-50%, -50%) rotateZ(0);
+  }
+
+  100% {
+    transform: translate(-50%, -50%) rotateZ(360deg);
+  }
+}
+
+.config-number, .param {
+  background: #fff;
+  color: #4c4c4c;
+  box-shadow: 1px 2px 2px rgba(0, 0, 0, 0.4) inset;
+  text-align: right;
+  width: 64px;
+  display: inline-block;
+  border-radius: 5px;
+  border: none;
+  padding-right: 5px;
+  margin-left: 5px;
+}
+
+/* セクション */
+section {
+  margin: 1px;
+  margin-top: 10px;
+  padding: 4px;
+  background: #6BE3F2;
+  border: 2px solid #66cbd8;
+  h2 {
+    margin: 0 -4px 6px;
+    padding: 4px 18px;
+    font-size: larger;
+    color: #fff;
+    text-shadow: 0 1px 0 #66cbd8, 0 -1px 0 #66cbd8, 1px 0 0 #66cbd8, -1px 0 0 #66cbd8;
+  }
+  h3 {
+    margin: 0;
+    text-align: center;
+    font-size: 12.5px;
+    color: #fff;
+    text-shadow: 0 1px 0 #66cbd8, 0 -1px 0 #66cbd8, 1px 0 0 #66cbd8, -1px 0 0 #66cbd8;
+  }
+}
+
+.explanation {
+  background: rgba(255, 255, 255, 0.95);
+  color: #000;
+  border: 2px solid #66cbd8;
+  margin: 0;
+  padding-left: 32px;
+}
+
+/* ボタン */
+#control {
+  padding: 8px;
+  .button {
+    display: block;
+    margin: 5px auto;
+    width: 40px;
+    &:hover {
+      background: #ee34a8;
+    }
+  }
+}
+
+.button {
+  border: 2px solid #fff;
+  border-radius: 3px;
+  max-height: 20px;
+  padding: 1px 5px;
+  color: #fff;
+  font-size: 11px;
+  cursor: pointer;
+  @include background(linear-gradient(#2a8f88, #48c6c3));
+  display: inline-table;
+  text-align: center;
+  text-shadow: 1px 1px rgba(0, 0, 0, 0.2);
+  box-shadow: 1px 1px rgba(0, 0, 0, 0.2), 1px 1px rgba(0, 0, 0, 0.2) inset;
+  margin: 0 1px;
+  position: relative;
+  &:hover {
+    background: #41dcd1;
+  }
+}
+
+#save-slot ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.no-data {
+  background: #888;
+  pointer-events: none;
+}
+
+#rival-template .button {
+  width: 100px;
+}
+
+#mini-unit {
+  min-width: 55px;
+  position: absolute;
+  bottom: 120%;
+  left: -2px;
+  font-size: x-small;
+  text-align: center;
+  opacity: .8;
+  animation: spread .1s ease-out;
+}
+
+#result-wrapper {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+#result {
+  width: 445px;
+}
+
+#known {
+  width: 220px;
+}
+
+/* 結果表示欄 */
+#result-table {
+  text-align: center;
+  margin: auto;
+  cursor: default;
+}
+
+.result-unit {
+  width: 82px;
+  font-family: 'Play', sans-serif;
+}
+
+#result {
+  tbody td {
+    &:first-child, &:nth-child(10n+1) {
+      text-align: right;
+    }
+  }
+  .rank { width: 32px; }
+  .rate { width: 64px; }
+  .util { width: 58px; }
+}
+
+#result-table {
+  tr {
+    background: rgba( #fff, .9 );
+  }
+  tbody tr:hover {
+    background: rgba( #bbeaf0, .9 );
+  }
+}
+
+/* 確定済み指定欄 */
+.known-table {
+  color: #ee34a8;
+  text-align: right;
+  font-size: small;
+  display: inline-table;
+  cursor: default;
+  background: rgba( #fff, .9 );
+  width: 100%;
+  border: 2px solid $lightblue;
+  padding: 0 10px;
+}
+
+.unit-caption {
+  background: $lightblue;
+  text-align: left;
+  margin-right: 20px;
+  padding-left: 10px;
+  height: 20px;
+  color: #fff;
+  font-family: 'Play', sans-serif;
+  font-weight: bold;
+  &:after {
+    content:'';
+    position: absolute;
+    border: solid 10px transparent;
+    border-bottom-color: $lightblue;
+    border-left-color: $lightblue;
+    right: 0;
+  }
+}
+
+.known-unit {
+  text-align: center;
+  position: relative;
+  margin-top: 3px;
+}
+
+#known td {
+    cursor: pointer;
+}
+.expectation {
+  float: right;
+  cursor: pointer;
+  @include outline( $darkcyan );
+  &:empty {
+    pointer-events: none;
+  }
+}
+.win { color: #fcff50; }
+.lose { color: $blue; }
+.error {
+	color: #f00 !important;
+	border-color: #f00 !important;
+}
+/* モーダルウィンドウの設定 */
+#overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: none;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+#config {
+  margin: auto;
+  padding: 8px;
+  top: 200%;
+  left: 0;
+  right: 0;
+  bottom: 10%;
+  width: 500px;
+  background: rgba(107, 227, 242, 0.5);
+  border: 2px solid #66cbd8;
+  font-size: small;
+  position: absolute;
+  display: table;
+  text-align: center;
+}
+
+#close-config {
+  position: absolute;
+  right: 0;
+  bottom: 102%;
+  width: 16px;
+  height: 16px;
+  color: #FFF;
+  border: 2px solid;
+  border-radius: 2px;
+  background: rgba(255, 154, 0, 0.8);
+  font-weight: bold;
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.4) inset;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.4);
+  text-align: center;
+  line-height: 18px;
+  cursor: pointer;
+}
+
+#config p {
+  display: inline-table;
+  margin: 0 10px 0 0;
+}
+
+.config-label {
+  width: 250px;
+  text-align: right;
+}
+
+.config-input {
+  width: 180px;
+  text-align: left;
+}
+
+.config-content {
+  margin-bottom: 7px;
+  border: 1px solid #fff;
+  background: rgba(255, 255, 255, 0.8);
+  position: relative;
+  &:after {
+    content: '';
+    position: absolute;
+    border: 1px solid #fff;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    pointer-events: none;
+  }
+}
+
+%interface {
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 20px;
+  font-size: smaller;
+}
+
+/* プログレスバー */
+#progress, #bar {
+  @extend %interface;
+  top: 0;
+  display: none;
+}
+
+#progress {
+  height: 100%;
+  cursor: wait;
+  z-index: 10;
+}
+
+#bar {
+  height: 5px;
+  background: #ee34a8;
+  box-shadow: 2px 2px 2px rgba(102, 0, 0, 0.5);
+  transition: width .2s;
+}
+
+/* メッセージ領域 */
+#message {
+  @extend %interface;
+  bottom: 20px;
+  text-align: center;
+  background: rgba(238, 52, 168, 0.85);
+  color: #fff;
+  display: none;
+}
+
+/* フッター */
+footer {
+  @extend %interface;
+  background: #fff;
+  bottom: 0;
+  text-align: right;
+  z-index: 100;
+}
