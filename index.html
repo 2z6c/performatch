@@ -8,14 +8,16 @@
     <meta name="description" content="ナナシスの『パフォーマッチ』イベントで勝率の高いユニットの選び方をシミュレートするアプリ">
     <meta name="author" content="Nisaac" href="https://twitter.com/NisaacFuri">
     <!-- OGP -->
-    <meta property="og:url" content="">
+    <meta property="og:url" content="http://nisaacfuri.github.io/performatch/">
     <meta property="og:type" content="website">
     <meta property="og:title" content="ナナシス パフォーマッチシミュレータ">
     <meta property="og:description" content="ナナシスの『パフォーマッチ』イベントで勝率の高いユニットの選び方を計算するアプリ">
     <!-- /OGP -->
     <!-- favicon -->
     <!--link rel="icon" href="favicon.ico"-->
+    <!-- Fonts -->
     <link href='https://fonts.googleapis.com/css?family=Play' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Orbitron:700' rel='stylesheet' type='text/css'>
     <!-- CSS -->
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
     <link rel="stylesheet" type="text/css" href="t7s.css">
@@ -26,6 +28,7 @@
   </head>
   <body>
     <div id="main-contents">
+    <span id="subtitle">Tokyo 7th Sisters:// PERFORMANCE MATCH Simulator;</span>
     <h1>ナナシス パフォーマッチシミュレータ</h1>
     <section id="unit-area">
       <div id="unit-editor">
@@ -69,15 +72,15 @@
       <table id="result-table">
         <thead>
           <tr>
-            <th rowspan="2" class="rank">#</th>
-            <th colspan="9">順番</th>
-            <th rowspan="2" class="rate">勝率</th>
-            <th rowspan="2" class="util">コピー</th>
+            <th rowspan="2" class="rank">&#9873;</th>
+            <th colspan="3">ORDER</th>
+            <th rowspan="2" class="rate">WIN</th>
+            <td rowspan="2" class="util" title="結果から確定枠へコピー">DUP</td>
           </tr>
           <tr>
-            <td colspan=3 class="result-unit">1st Unit</td>
-            <td colspan=3 class="result-unit">2nd Unit</td>
-            <td colspan=3 class="result-unit">3rd Unit</td>
+            <td class="result-unit">1st Unit</td>
+            <td class="result-unit">2nd Unit</td>
+            <td class="result-unit">3rd Unit</td>
           </tr>
         </thead>
         <tbody></tbody>
@@ -87,7 +90,7 @@
       <h2>確定メンバー</h2>
       <a id="reset-all" class="button">結果と固定枠をリセット</a>
       <div class="known-unit template">
-        <div class="unit-caption">1st Unit</span></div>
+        <div class="unit-caption">1st Unit</div>
         <table class="known-table">
           <tbody>
             <tr class="you used-unit">
@@ -139,6 +142,7 @@
     <footer>
       <!--a href="https://twitter.com/share" class="twitter-share-button" data-lang="ja">ツイート</a>
       <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script-->
+      <a href="https://github.com/nisaacfuri/performatch">GitHub</a>
       ©2016 <a href="https://twitter.com/NisaacFuri">@NisaacFuri</a>
     </footer>
   </body>

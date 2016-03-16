@@ -2,7 +2,7 @@
  * Tokyo 7th Sisters: 7th パフォーマッチ イベントのじゃんけんゲーの最善手を総当りで求める
  */
 
-$(document).ready(function(){
+$(document).ready(() => {
 'use strict';
 
 //javascript無効状態の警告文を消す
@@ -92,9 +92,9 @@ config.Radio = function( text, option, defVal ) {
       value: i,
       checked: i === this.value,
     }).on({
-      change: () => {
+      change: (i => () => {
         this.value = i;
-      },
+      })(i),
     });
     this.$input.append( $input, $label, '<br>' );
   }
@@ -120,7 +120,7 @@ config.Quantity = function( text, min, max, defVal ) {
     value: defVal || min,
   }).addClass('config-number').on({
     change: () => {
-      this.value = parseInt( $input.val() );
+      this.value = $input.val();
     },
   });
   this.$input = $('<p>').addClass('config-input').append( $input );
@@ -149,6 +149,7 @@ var option = {
   resultDisplay: new config.Quantity( '結果の表示数', 1, 1680, 10 ),
   resetWhenRegroup: new config.YN( '編成変更時に確定枠をリセットする', true ),
   showProgress: new config.YN( '計算中プログレスバーを表示する', true ),
+  messageFadeTime: new config.Quantity( 'メッセージの表示時間(秒)', 0, Infinity, 1 ),
 };
 
 //コンフィグオブジェクトからhtml要素を生成する
@@ -163,7 +164,7 @@ for ( var t in option ) {
   let $fixerTemplate = $('.known-unit');
   for ( let i = 0; i < 3; i++ ) {
     let $fixer = $fixerTemplate.clone().removeClass('template').appendTo( $known );
-    let $caption = $fixer.find('.unit-caption').text( ['1st','2nd','3rd'][i] + 'Unit' );
+    let $caption = $fixer.find('.unit-caption').text( ['1st','2nd','3rd'][i] + ' Unit' );
     let $expect = $('<span>').addClass('expectation').appendTo( $caption ).on({
       click: function(e){
         var $this = $(this);
@@ -204,7 +205,7 @@ for ( var t in option ) {
   }
   /** 確定枠の配列から勝敗を推定する */
   var expect = function( $fixer, $expect ) {
-    var $idol = $fixer.find('td').not(':empty');
+    var $idol = $fixer.find('.idol').not(':empty');
     if ( $idol.length !== 6 ) return;
     var idol = [[],[]];
     for ( let i = 0; i < 3; i ++ ) {
@@ -389,11 +390,11 @@ var selectType = function( e, callback, withNT ) {
   for ( let i = 0; i < qType; i++ ) {
     let $li = $('<a>').text( type[i].abbr ).addClass( type[i].abbr ).attr({title:type[i].name});
     $li.on({
-      click: e => {
+      click: ( i => e => {
         callback( i );
         closeSelect(e);
         return false;
-      }
+      })(i)
     }).appendTo($list).wrap('<li class="type-option">');
   }
   e.stopPropagation();
@@ -557,28 +558,40 @@ $body.on({ click: closeSelect });
     }
     return p.then( () => {
       results.sort( function(a,b){ return b.win-a.win; } );
-      var i = 0, unique = [], n = 0;
-      while ( n < option.resultDisplay.value && results[i] ) {
+      var i = 0, n = 0, max = parseInt( option.resultDisplay.value ) || 10;
+      while ( n < max && results[i] ) {
         let r = results[i];
-        unique.push( r.unit );
-        let $tr = $('<tr>').appendTo( $result ).append( $('<td>').text(++n).addClass('rank') );
-        for ( let j = 0; j < 9; j++ ) {
-          $('<td>').addClass(type[r.unit[j]].abbr)
-            .addClass('idol')
-            .text(type[r.unit[j]].abbr)
-            .data('type', r.unit[j])
-            .appendTo($tr);
-        }
-        $('<td>').text( ( r.win / u2s.length ).toFixed(3) ).appendTo($tr).addClass('rate');
-        let copyButton = [
-          $('<a>').text(1).on({click: copyResult.bind( null, 1, $tr )}).addClass('copy button').attr('title','1stユニットの並びを確定欄に反映'),
-          $('<a>').text(2).on({click: copyResult.bind( null, 2, $tr )}).addClass('copy button').attr('title','2ndユニットの並びを確定欄に反映'),
-        ];
-        $('<td>').append( copyButton ).appendTo($tr);
+        makeResultLine( ++n, r.unit, ( r.win / u2s.length ).toFixed(3) );
         i++;
       }
       console.timeEnd('BF');
     });
+  };
+  //結果テーブルの1行を作る
+  let makeResultLine = function( n, unit, wp ) {
+    let $tr = $('<tr>').appendTo( $result ).append( $('<td>').text(n).addClass('rank') );
+    for ( let i = 0; i < 3; i++ ) {
+      let $unit = $('<td>').addClass('unit3-wrapper').appendTo( $tr );
+      for ( let j = 0; j < 3; j++ ) {
+        let tag = type[ unit[i*3+j] ].abbr;
+        $('<div>').addClass( 'idol ' + tag )
+          .text( tag )
+          .data( 'type', unit[i*3+j] )
+          .appendTo( $unit );
+      }
+    }
+    $('<td>').text( wp ).appendTo($tr).addClass('rate');
+    let $copyButton = [
+      makeCopyButton( 1, $tr ), makeCopyButton( 2, $tr )
+    ];
+    $('<td>').append( $copyButton ).appendTo($tr);
+  };
+  //確定枠コピーボタン
+  let makeCopyButton = function( n, $tr ){
+    return $('<a>').text(n)
+      .on({click: copyResult.bind( null, n, $tr )})
+      .addClass('copy button')
+      .attr('title', `${['1st','2nd','3rd'][n-1]}ユニットの並びを確定欄に反映`);
   };
 }
 
@@ -588,7 +601,7 @@ $body.on({ click: closeSelect });
  * @param {$} $tr - 結果の行
  */
 var copyResult = function( n, $tr ){
-  var $idol = $tr.find('td.idol');
+  var $idol = $tr.find('.idol');
   var unit = [];
   for ( let i = (n-1)*3; i < n*3; i++ ) {
     let type = $idol.eq(i).data('type');
@@ -669,23 +682,21 @@ var makeUniqueUnits = function( m, f ) {
 //ユニットセーブ/ロードボタンの初期化
 {
   let $slots = $('<ul>').appendTo('#save-slot');
-  let nSlot = 4;
+  let nSlot = 5;
   for ( let i = 0; i < nSlot; i++ ) {
     let unitData = window.localStorage.getItem( 'unit'+i );
     let $li = $('<li>').appendTo( $slots );
     //セーブボタン
     let $save = $('<a>').addClass('save button').on({
-       click: () => {
-         $save.removeClass('no-data');
-         $load.data('unit', { type: manager[0].type, unit: manager[0].unit })
+      click: (i => (() => {
+        $save.removeClass('no-data');
+        $load.data('unit', { type: manager[0].type, unit: manager[0].unit }).removeClass('no-data');
         manager[0].save(i);
-      }
+      }))(i)
     }).text(`SAVE ${i+1}`).appendTo( $li );
     //ロードボタン
     let $load = $('<a>').addClass('load button').on({
-      click: () => {
-        manager[0].load(i);
-      },
+      click: manager[0].load.bind( manager[0], i ),
       mouseover: () => {
         showMiniUnit( $load, $load.data( 'unit' ) );
       },
@@ -727,6 +738,14 @@ var makeUniqueUnits = function( m, f ) {
       m.unit = [a,a,a,a,a,a,a,a,a];
     },
   }, {
+    text: '両翼楔型',
+    generate: m => {
+      var a = m.type;
+      var b = (a + 2) % 5;
+      var c = (a + 3) % 5;
+      m.unit = [a,a,a,b,b,b,c,c,c];
+    },
+  }, {
     text: '楔型弱点カバー',
     generate: m => {
       var a = m.type;
@@ -751,15 +770,16 @@ var makeUniqueUnits = function( m, f ) {
     },
   }];
   //相手のテンプレ編成ボタン
-  let $buttonBox = $('#rival-template');
-  for ( let i = 0, tmp; tmp = template[i]; i++ ) { 
+  let $buttonBox = $('<ul>').appendTo('#rival-template');
+  for ( let i = 0; i < template.length; i++ ) {
+    let tmp = template[i];
     $('<a>').addClass('button').on({
       click: () => {
         resetFixing();
         tmp.generate( manager[1] );
         manager[1].output();
       }
-    }).text( tmp.text ).appendTo($buttonBox).after('<br>');
+    }).text( tmp.text ).appendTo($buttonBox).wrap('<li>');
   }
 }
 
@@ -775,15 +795,16 @@ var resetFixing = function(){
 
 /** メッセージを表示する */
 var pline = function( text ){
-  $pline.text( text ).show().delay(500).fadeOut({ complete: function(){$pline.text('');} });
-  console.log( text );
+  var time = option.messageFadeTime.value * 1000;
+  $pline.text( text ).show().delay( time ).fadeOut({ complete: function(){$pline.text('');} });
+  console.info( text );
 };
 
 //コンフィグウィンドウ関連
 /** モーダル(コンフィグ)を閉じる */
 var closeModal = function(){
-  $config.animate({top: '200%'}, {easing: 'easeInBack'});
-  $modal.fadeOut({easing: 'easeInExpo'});
+  $config.animate({ top: '200%' }, { easing: 'easeInBack' });
+  $modal.fadeOut({ easing: 'easeInExpo' });
   //ブラウザに設定を保存する
   var data = {};
   for ( let k in option ) {
@@ -801,14 +822,14 @@ $modal.on({
 });
 $('#config-button').on({
   click: () => {
-    $modal.fadeIn({easing: 'easeOutExpo'});
-    $config.animate({top: '10%'}, {easing: 'easeOutBack'});
+    $modal.fadeIn({ easing: 'easeOutExpo' });
+    $config.animate({ top: '10%' }, { easing: 'easeOutBack' });
   }
 });
 
 //初期化処理
-Promise.resolve(0).then( () => { manager[0].load(0); } ).catch( e=> {
-  console.debug('アップデートで古いデータが読み込めない可能性があります',e);
+Promise.resolve(0).then( () => { manager[0].load(0); } ).catch( e => {
+  console.debug( 'アップデートで古いデータが読み込めない可能性があります', e );
 }).then( () => {
   //コンフィグファイルの読み込み
   var json = window.localStorage.getItem( 'config' );

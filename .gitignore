@@ -50,3 +50,6 @@ Temporary Items
 /*/
 config.*
 *.map
+gruntfile.js
+*.json
+*.png

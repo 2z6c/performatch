@@ -5,9 +5,12 @@ $orange: #ffa800;
 $blue: #0babf6;
 $lightblue: #50c2f8;
 $cyan: #8ff5fe;
+$lightcyan: #f3fbff;
 $darkcyan: #00c3dd;
 $magenta: #ff4873;
 $text-magenta: #f228ab;
+$black: #4c4c4c;
+$yellow: #ffff64;
 
 $type: Vo Va Mo Pl Da NT;
 
@@ -26,11 +29,19 @@ $type-color: $Vo $Va $Mo $Pl $Da;
 body {
   margin: 0;
   font-family: 'ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ',Meiryo,'ＭＳ Ｐゴシック','MS PGothic',sans-serif;
-  color: #4c4c4c;
+  color: $black;
 }
 
 h1 {
   color: $blue;
+  margin: 0 0 16px;
+}
+
+#subtitle {
+  font-family: 'Orbitron';
+  font-size: 10.5px;
+  margin-top: 16px;
+  display: block;
 }
 
 #main-contents {
@@ -44,7 +55,9 @@ h1 {
   display: none;
 }
 
-.button, .idol, .known-table {
+.button,
+.idol,
+.known-unit {
   @include user-select( none );
 }
 
@@ -54,7 +67,15 @@ h1 {
 
 .unit-panel {
   width: 120px;
-  padding: 3px;
+  text-align: center;
+  background: rgba( $cyan, .7 );
+  border: 1px solid $blue;
+  margin: 0 8px;
+}
+
+#unit-area {
+  border-width: 1px;
+  padding: 10px;
 }
 
 #unit-editor {
@@ -246,27 +267,28 @@ section {
   margin: 1px;
   margin-top: 10px;
   padding: 4px;
-  background: #6BE3F2;
-  border: 2px solid #66cbd8;
+  background-image: inline-image('bg2.png');
+  border: 5px solid $blue;
   h2 {
-    margin: 0 -4px 6px;
-    padding: 4px 18px;
+    margin: -4px -4px 6px;
+    padding: 0;
     font-size: larger;
-    color: #fff;
-    text-shadow: 0 1px 0 #66cbd8, 0 -1px 0 #66cbd8, 1px 0 0 #66cbd8, -1px 0 0 #66cbd8;
+    color: $yellow;
+    background: $blue;
+    text-align: center;
   }
   h3 {
     margin: 0;
-    text-align: center;
     font-size: 12.5px;
     color: #fff;
-    text-shadow: 0 1px 0 #66cbd8, 0 -1px 0 #66cbd8, 1px 0 0 #66cbd8, -1px 0 0 #66cbd8;
+    background: $blue;
+    text-align: center;
   }
 }
 
 .explanation {
-  background: rgba(255, 255, 255, 0.95);
-  color: #000;
+  background: rgba(255, 255, 255, 0.9);
+  color: $black;
   border: 2px solid #66cbd8;
   margin: 0;
   padding-left: 32px;
@@ -305,10 +327,10 @@ section {
   }
 }
 
-#save-slot ul {
+.unit-panel ul {
   list-style-type: none;
   padding: 0;
-  margin: 0;
+  margin: 3px;
 }
 
 .no-data {
@@ -338,7 +360,7 @@ section {
 }
 
 #result {
-  width: 445px;
+  width: 430px;
 }
 
 #known {
@@ -346,15 +368,8 @@ section {
 }
 
 /* 結果表示欄 */
-#result-table {
-  text-align: center;
-  margin: auto;
-  cursor: default;
-}
-
 .result-unit {
-  width: 82px;
-  font-family: 'Play', sans-serif;
+  width: 86px;
 }
 
 #result {
@@ -369,11 +384,27 @@ section {
 }
 
 #result-table {
-  tr {
-    background: rgba( #fff, .9 );
+  text-align: center;
+  margin: auto;
+  cursor: default;
+  font-family: 'Play';
+  border-collapse: collapse;
+  thead {
+    color: $darkcyan;
+      background: rgba( #fff, .7 );
   }
-  tbody tr:hover {
-    background: rgba( #bbeaf0, .9 );
+  tbody tr {
+    border-top: 1px solid $darkcyan;
+    &:nth-child(2n) {
+      background: rgba( #fff, .7 );
+    }
+    &:hover {
+      background: rgba( #bbeaf0, .9 );
+    }
+    td > * {
+      display: inline-block;
+      margin: 1px;
+    }
   }
 }
 
@@ -397,7 +428,6 @@ section {
   padding-left: 10px;
   height: 20px;
   color: #fff;
-  font-family: 'Play', sans-serif;
   font-weight: bold;
   &:after {
     content:'';
@@ -421,12 +451,13 @@ section {
 .expectation {
   float: right;
   cursor: pointer;
+  line-height: 20px;
   @include outline( $darkcyan );
   &:empty {
     pointer-events: none;
   }
 }
-.win { color: #fcff50; }
+.win { color: $yellow; }
 .lose { color: $blue; }
 .error {
 	color: #f00 !important;
