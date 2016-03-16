@@ -76,6 +76,7 @@ h1 {
 .idol {
   width: 24px;
   height: 24px;
+  line-height: 24px;
   border: 1px solid #50c2f8;
   background: #8ff5fe;
   text-align: center;
@@ -378,6 +379,10 @@ section h3 {
   animation: spread .1s ease-out;
 }
 
+.caution {
+  color: #f228ab;
+}
+
 #result-wrapper {
   display: flex;
   width: 100%;
@@ -553,6 +558,7 @@ section h3 {
 .config-label {
   width: 250px;
   text-align: right;
+  color: #f228ab;
 }
 
 .config-input {
@@ -619,4 +625,7 @@ footer {
   bottom: 0;
   text-align: right;
   z-index: 100;
+}
+footer > * {
+  vertical-align: top;
 }
