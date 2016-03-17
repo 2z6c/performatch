@@ -7,6 +7,7 @@ $(document).ready(() => {
 
 //javascript無効状態の警告文を消す
 $('#unable-js').remove();
+$('#unit-area').show();
 
 var type = [
   { name: 'ボーカリスト', abbr: 'Vo' },
@@ -493,13 +494,14 @@ $body.on({ click: closeSelect });
     });
   };
 
+  let calcTimer = 0;
   /**
    * ブルートフォースでの確率計算
    * @param {Manager} p1 - 自分
    * @param {Manager} p2 - 相手
    */
   let bruteforce = function( p1, p2 ) {
-    console.time('BF');
+    if ( window.performance ) calcTimer = performance.now();
     var u2s = [];
     u2s = permute( p2.fixed, p2.rest, p2.rest.length );
 
@@ -564,7 +566,7 @@ $body.on({ click: closeSelect });
         makeResultLine( ++n, r.unit, ( r.win / u2s.length ).toFixed(3) );
         i++;
       }
-      console.timeEnd('BF');
+      if ( window.performance && ga ) ga( 'send', 'timing', 'JS Dependencies', 'calc', performance.now() - calcTimer );
     });
   };
   //結果テーブルの1行を作る
