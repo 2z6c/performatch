@@ -30,6 +30,10 @@ body {
   margin: 0;
   font-family: 'ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ',Meiryo,'ＭＳ Ｐゴシック','MS PGothic',sans-serif;
   color: $black;
+  font-size: 15px;
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
 }
 
 h1 {
@@ -66,7 +70,7 @@ h1 {
 }
 
 .unit-panel {
-  width: 120px;
+  width: 125px;
   text-align: center;
   background: rgba( $cyan, .7 );
   border: 1px solid $blue;
@@ -273,7 +277,7 @@ section {
   h2 {
     margin: -4px -4px 6px;
     padding: 0;
-    font-size: larger;
+    font-size: 19px;
     color: $yellow;
     background: $blue;
     text-align: center;
@@ -362,6 +366,7 @@ section {
   display: flex;
   width: 100%;
   justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 #result {
@@ -421,7 +426,8 @@ section {
   display: inline-table;
   cursor: default;
   background: rgba( #fff, .9 );
-  width: 100%;
+  /*width: 100%;*/
+  width: 220px;
   border: 2px solid $lightblue;
   padding: 0 10px;
 }
@@ -432,6 +438,7 @@ section {
   margin-right: 20px;
   padding-left: 10px;
   height: 20px;
+  width: 190px;
   color: #fff;
   font-weight: bold;
   &:after {
@@ -448,6 +455,13 @@ section {
   text-align: center;
   position: relative;
   margin-top: 3px;
+  width: 220px;
+}
+
+#known-unit-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
 
 #known td {
@@ -552,7 +566,7 @@ section {
   left: 0;
   right: 0;
   height: 20px;
-  font-size: smaller;
+  font-size: 13.5px;
 }
 
 /* プログレスバー */
@@ -595,4 +609,11 @@ footer {
   & > * {
     vertical-align: top;
   }
+}
+
+//スマホ対応
+@media screen and (max-width: 480px) {
+.unit-panel, .util { display: none; }
+h1 { font-size: 25px; }
+#main-contents, #result-wrapper > * { width: 375px; }
 }

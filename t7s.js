@@ -22,7 +22,7 @@ var $config = $('#config');
 var $cell = $('.unit td');
 var $manager = $('.unit');
 var $result = $('#result-table tbody');
-var $known = $('#known');
+var $known = $('#known-unit-wrapper');
 var $you = $('#you');
 var $rival = $('#rival');
 var $pline = $('#message');
@@ -602,7 +602,7 @@ $body.on({ click: closeSelect });
     let $copyButton = [
       makeCopyButton( 1, $tr ), makeCopyButton( 2, $tr )
     ];
-    $('<td>').append( $copyButton ).appendTo($tr);
+    $('<td>').addClass('util').append( $copyButton ).appendTo($tr);
   };
   //確定枠コピーボタン
   let makeCopyButton = function( n, $tr ){
