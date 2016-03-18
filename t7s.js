@@ -145,6 +145,7 @@ var option = {
   ]),
   resultDisplay: new config.Quantity( '結果の表示数', 1, 1680, 8 ),
   resetWhenRegroup: new config.YN( '編成変更時に確定枠をリセットする', true ),
+  omitDuplicatedResults: new config.YN( 'ユニットの並び替えで重複する結果を除外', false ),
   showProgress: new config.YN( '計算中プログレスバーを表示する', true ),
   messageFadeTime: new config.Quantity( 'メッセージの表示時間(秒)', 0, Infinity, 1 ),
 };
@@ -564,7 +565,7 @@ $body.on({ click: closeSelect });
       let fixed = Math.max( manager[0].fixed.length, manager[1].fixed.length );
       while ( n < max && results[i] ) {
         let r = results[i];
-        if ( i > 0 && r.win === results[i-1].win ){
+        if ( i > 0 && r.win === results[i-1].win && option.omitDuplicatedResults.value ){
           if( isCongruent( r.unit, honored, fixed ) ) {
             i++;
             continue;
