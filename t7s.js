@@ -5,17 +5,13 @@
 $(document).ready(() => {
 'use strict';
 
-//javascript無効状態の警告文を消す
-$('#unable-js').remove();
-$('#unit-area').show();
-
 var type = [
-  { name: 'ボーカリスト', abbr: 'Vo' },
-  { name: 'バラドル',     abbr: 'Va' },
-  { name: 'モデル',       abbr: 'Mo' },
-  { name: 'プレイヤー',   abbr: 'Pl' },
-  { name: 'ダンサー',     abbr: 'Da' },
-  { name: 'ノータイプ',   abbr: 'NT' },
+  { name: 'ボーカリスト', tag: 'Vo' },
+  { name: 'バラドル',     tag: 'Va' },
+  { name: 'モデル',       tag: 'Mo' },
+  { name: 'プレイヤー',   tag: 'Pl' },
+  { name: 'ダンサー',     tag: 'Da' },
+  { name: 'ノータイプ',   tag: 'NT' },
 ];
 
 const TYPECLASS = 'Vo Va Mo Pl Da NT ';
@@ -147,7 +143,7 @@ var option = {
     '勝敗判定に使用する',
     '無視する',
   ]),
-  resultDisplay: new config.Quantity( '結果の表示数', 1, 1680, 10 ),
+  resultDisplay: new config.Quantity( '結果の表示数', 1, 1680, 8 ),
   resetWhenRegroup: new config.YN( '編成変更時に確定枠をリセットする', true ),
   showProgress: new config.YN( '計算中プログレスバーを表示する', true ),
   messageFadeTime: new config.Quantity( 'メッセージの表示時間(秒)', 0, Infinity, 1 ),
@@ -340,7 +336,7 @@ Manager.prototype = {
   },
   /** データをテーブルに反映させる */
   output: function(){
-    let tag = type[ this.type ].abbr;
+    let tag = type[ this.type ].tag;
     this.$table.data('type', this.type).removeClass('Vo Va Mo Pl Da').addClass(tag);
     for ( let i = 0; i < 9; i++ ) {
       changeCellType( this.$cell.eq(i), this.unit[i] );
@@ -389,7 +385,7 @@ var selectType = function( e, callback, withNT ) {
   $cell.removeClass( 'selecting' );
   var $list = $('<ul>').addClass('type-select').appendTo( $body ).css({top: e.pageY, left: e.pageX});
   for ( let i = 0; i < qType; i++ ) {
-    let $li = $('<a>').text( type[i].abbr ).addClass( type[i].abbr ).attr({title:type[i].name});
+    let $li = $('<a>').text( type[i].tag ).addClass( type[i].tag ).attr({title:type[i].name});
     $li.on({
       click: ( i => e => {
         callback( i );
@@ -415,7 +411,7 @@ var closeSelect = function(e){
  * @param {number} t - 属性
  */
 var changeCellType = function( $cell, t ) {
-  var tag = type[t].abbr;
+  var tag = type[t].tag;
   $cell.removeClass('Vo Va Mo Pl Da NT selecting').addClass( tag ).text( tag ).data('type',t);
 };
 
@@ -424,7 +420,7 @@ $manager.on({
   click: function(e){
     var $this = $(this);
     selectType( e, function( i ){
-      var tag = type[i].abbr;
+      var tag = type[i].tag;
       $this.removeClass('Vo Va Mo Pl Da').addClass( tag ).data('type',i);
       $this.data('manager').input();
     }, false );
@@ -560,22 +556,41 @@ $body.on({ click: closeSelect });
     }
     return p.then( () => {
       results.sort( function(a,b){ return b.win-a.win; } );
-      var i = 0, n = 0, max = parseInt( option.resultDisplay.value ) || 10;
+      let i = 0;
+      let n = 0;
+      let rank = 0;
+      let max = parseInt( option.resultDisplay.value ) || 10;
+      let honored = [];
+      let fixed = Math.max( manager[0].fixed.length, manager[1].fixed.length );
       while ( n < max && results[i] ) {
         let r = results[i];
-        makeResultLine( ++n, r.unit, ( r.win / u2s.length ).toFixed(3) );
-        i++;
+        if ( i > 0 && r.win === results[i-1].win ){
+          if( isCongruent( r.unit, honored, fixed ) ) {
+            i++;
+            continue;
+          }
+        } else {
+          rank = n+1;
+        }
+        honored.push( r.unit.toString() );
+        makeResultLine( rank, r.unit, ( r.win / u2s.length ).toFixed(3) );
+        i++; n++;
       }
       if ( window.performance && ga ) ga( 'send', 'timing', 'JS Dependencies', 'calc', performance.now() - calcTimer );
     });
   };
-  //結果テーブルの1行を作る
-  let makeResultLine = function( n, unit, wp ) {
-    let $tr = $('<tr>').appendTo( $result ).append( $('<td>').text(n).addClass('rank') );
+  /**
+   * 結果テーブルの1行を作る
+   * @param {number} rank - 順位
+   * @param {number[]} unit - ユニット配列
+   * @param {number} wp - 勝率
+   */
+  let makeResultLine = function( rank, unit, wp ) {
+    let $tr = $('<tr>').appendTo( $result ).append( $('<td>').text( rank ).addClass('rank') );
     for ( let i = 0; i < 3; i++ ) {
       let $unit = $('<td>').addClass('unit3-wrapper').appendTo( $tr );
       for ( let j = 0; j < 3; j++ ) {
-        let tag = type[ unit[i*3+j] ].abbr;
+        let tag = type[ unit[i*3+j] ].tag;
         $('<div>').addClass( 'idol ' + tag )
           .text( tag )
           .data( 'type', unit[i*3+j] )
@@ -594,6 +609,25 @@ $body.on({ click: closeSelect });
       .on({click: copyResult.bind( null, n, $tr )})
       .addClass('copy button')
       .attr('title', `${['1st','2nd','3rd'][n-1]}ユニットの並びを確定欄に反映`);
+  };
+  /**
+   * ユニット順の重複をチェック
+   * @param {Array} a - チェックする配列
+   * @param {Array} tests - テストする配列の配列
+   * @param {number} f - 固定枠の長さ
+   */
+  let isCongruent = function( a, tests, f ) {
+    if ( f >= 6 ) return false;
+    if ( f <= 3 ) {
+      if ( ~tests.indexOf( [a[0],a[1],a[2], a[6],a[7],a[8], a[3],a[4],a[5]].toString() ) ) return true;
+    }
+    if ( f === 0 ) {
+      if ( ~tests.indexOf( [a[6],a[7],a[8], a[0],a[1],a[2], a[3],a[4],a[5]].toString() ) ) return true;
+      if ( ~tests.indexOf( [a[6],a[7],a[8], a[3],a[4],a[5], a[0],a[1],a[2]].toString() ) ) return true;
+      if ( ~tests.indexOf( [a[3],a[4],a[5], a[0],a[1],a[2], a[6],a[7],a[8]].toString() ) ) return true;
+      if ( ~tests.indexOf( [a[3],a[4],a[5], a[6],a[7],a[8], a[0],a[1],a[2]].toString() ) ) return true;
+    }
+    return false;
   };
 }
 
@@ -719,12 +753,12 @@ var makeUniqueUnits = function( m, f ) {
    * @param {Object} data - ユニットデータ
    */
   let showMiniUnit = function( $parent, data ){
-    var $mini = $('<table id="mini-unit">').addClass( type[data.type].abbr ).appendTo( $parent );
+    var $mini = $('<table id="mini-unit">').addClass( type[data.type].tag ).appendTo( $parent );
     $('<caption>').appendTo( $mini ).text( type[data.type].name );
     for ( let i = 0; i < 3; i++ ) {
       let $tr = $('<tr>').appendTo( $mini );
       for ( let j = 0; j < 3; j++ ) {
-        let tag = type[data.unit[3*i+j]].abbr
+        let tag = type[data.unit[3*i+j]].tag;
         let $td = $('<td>').appendTo( $tr ).addClass( tag ).text( tag );
       }
     }
@@ -830,8 +864,13 @@ $('#config-button').on({
 });
 
 //初期化処理
-Promise.resolve(0).then( () => { manager[0].load(0); } ).catch( e => {
-  console.debug( 'アップデートで古いデータが読み込めない可能性があります', e );
+Promise.resolve(0).then( () => {
+  //javascript無効状態の警告文を消す
+  $('#unable-js').remove();
+  $('#unit-area').show();
+  manager[0].load(0);
+}).catch( e => {
+  console.debug( '初期化処理に失敗しました', e );
 }).then( () => {
   //コンフィグファイルの読み込み
   var json = window.localStorage.getItem( 'config' );
