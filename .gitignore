@@ -52,4 +52,6 @@ config.*
 *.map
 gruntfile.js
 *.json
-*.png
+/*.png
+!/img/
+/img/*/
