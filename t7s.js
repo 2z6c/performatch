@@ -470,6 +470,12 @@ $body.on({ click: closeSelect });
       }).catch( e => {
         if ( e instanceof Error ) console.error(e);
         else pline(e);
+        if ( window.ga ) {
+          ga( 'send', 'exception', {
+            exDescription: e.message||e,
+            exFatal: e instanceof Error
+          });
+        }
       }).then( () => {
         $progress.fadeOut();
         $bar.fadeOut();
@@ -480,10 +486,10 @@ $body.on({ click: closeSelect });
   /** 計算前の条件チェック */
   let isReadyToCalc = function(){
     return new Promise( (resolve, reject) => {
-      var fixed = [ manager[0].fixed.length, manager[1].fixed.length ];
       for ( let i = 0; i < 2; i ++ ) {
-        if ( fixed[i] % 3 > 0 ) {
-          manager[i].$known.eq(fixed[i]).addClass('error');
+        let fixed = manager[i].fixed.length;
+        if ( fixed % 3 > 0 ) {
+          manager[i].$known.eq(fixed).addClass('error');
           return reject( '確定枠はユニット(3人)単位で指定してください。' );
         }
       }
@@ -577,7 +583,17 @@ $body.on({ click: closeSelect });
         makeResultLine( rank, r.unit, ( r.win / u2s.length ).toFixed(3) );
         i++; n++;
       }
-      if ( window.performance && ga ) ga( 'send', 'timing', 'JS Dependencies', 'calc', performance.now() - calcTimer );
+      if ( window.ga ){
+        ga( 'send', 'event', 'complete', 'fixed', 'you', manager[0].fixed.length );
+        ga( 'send', 'event', 'complete', 'fixed', 'rival', manager[1].fixed.length );
+        for ( let k in option ) {
+          if ( option.hasOwnProperty( k ) ) ga( 'send', 'event', 'complete', 'config', k, option[k].value );
+        }
+        if ( window.performance ) {
+          let code = `${manager[0].fixed.length}:${manager[1].fixed.length}`;
+          ga( 'send', 'timing', 'Calculation', code, performance.now() - calcTimer );
+        }
+      }
     });
   };
   /**
@@ -884,3 +900,10 @@ Promise.resolve(0).then( () => {
 });
 
 });
+
+if ( !window.Promise ) {
+  if ( window.ga ) ga( 'send', 'exception', {
+    exDescription: 'Promise unsupported',
+    exFatal: true
+  });
+}
