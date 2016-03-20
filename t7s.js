@@ -5,7 +5,9 @@
 $(document).ready(() => {
 'use strict';
 
-var type = [
+let version = '1.2.0';
+
+const type = [
   { name: 'ボーカリスト', tag: 'Vo' },
   { name: 'バラドル',     tag: 'Va' },
   { name: 'モデル',       tag: 'Mo' },
@@ -26,7 +28,6 @@ var $known = $('#known-unit-wrapper');
 var $you = $('#you');
 var $rival = $('#rival');
 var $pline = $('#message');
-var $modal = $('#overlay');
 
 /** 昇順並び替え用コールバック */
 var asc = (a,b) => a-b;
@@ -853,38 +854,53 @@ var pline = function( text ){
   console.info( text );
 };
 
-//コンフィグウィンドウ関連
-/** モーダル(コンフィグ)を閉じる */
-var closeModal = function(){
-  $config.animate({ top: '200%' }, { easing: 'easeInBack' });
-  $modal.fadeOut({ easing: 'easeInExpo' });
-  //ブラウザに設定を保存する
-  var data = {};
-  for ( let k in option ) {
-    if ( option.hasOwnProperty(k) ) data[k] = option[k].value;
-  }
-  var json = JSON.stringify( data );
-  window.localStorage.setItem( 'config', json );
-};
-$modal.on({
-  click: closeModal
-}).children().on({
-  click: e => { e.stopPropagation(); }
-}).children().first().on({
-  click: closeModal
-});
-$('#config-button').on({
-  click: () => {
+//モーダルウィンドウ関連
+{
+  let $modal = $('#overlay');
+  let $dialog;
+  let onClose = () => 0;
+  let openModal = ( $d, callback ) => {
+    if ( !$modal.has( $d ) ) return false;
+    $dialog = $d;
+    onClose = callback;
     $modal.fadeIn({ easing: 'easeOutExpo' });
-    $config.animate({ top: '10%' }, { easing: 'easeOutBack' });
-  }
-});
+    $d.animate({ top: '10%' }, { easing: 'easeOutBack' });
+  };
+  /** モーダル(コンフィグ)を閉じる */
+  var closeModal = () => {
+    $dialog.animate({ top: '200%' }, { easing: 'easeInBack' });
+    $modal.fadeOut({ easing: 'easeInExpo' });
+    if ( onClose ) onClose();
+  };
+  //コンフィグウィンドウ関連
+  $modal.on({
+    click: closeModal
+  }).children().on({
+    click: e => { e.stopPropagation(); }
+  }).children().first().on({
+    click: closeModal
+  });
+  $('#config-button').on({
+    click: () => {
+      openModal( $config, () => {
+        //ブラウザに設定を保存する
+        var data = {};
+        for ( let k in option ) {
+          if ( option.hasOwnProperty(k) ) data[k] = option[k].value;
+        }
+        var json = JSON.stringify( data );
+        window.localStorage.setItem( 'config', json );
+      });
+    }
+  });
+}
 
 //初期化処理
 Promise.resolve(0).then( () => {
   //javascript無効状態の警告文を消す
   $('#unable-js').remove();
   $('#unit-area').show();
+  $('#version').text( `ver. ${version}` );
   manager[0].load(0);
 }).catch( e => {
   console.debug( '初期化処理に失敗しました', e );
