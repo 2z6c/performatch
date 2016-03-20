@@ -299,6 +299,12 @@ section {
   padding-left: 32px;
 }
 
+.footnote {
+  vertical-align: super;
+  cursor: help;
+  color: $text-magenta;
+}
+
 /* ボタン */
 #control {
   padding: 8px;

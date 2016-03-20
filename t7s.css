@@ -321,6 +321,12 @@ section h3 {
   padding-left: 32px;
 }
 
+.footnote {
+  vertical-align: super;
+  cursor: help;
+  color: #f228ab;
+}
+
 /* ボタン */
 #control {
   padding: 8px;
