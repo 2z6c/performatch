@@ -611,6 +611,14 @@ footer {
   }
 }
 
+#social {
+  display: inline-block;
+  float: left;
+  & > * {
+    vertical-align: top;
+  }
+}
+
 //スマホ対応
 @media screen and (max-width: 480px) {
 .unit-panel, .util { display: none; }

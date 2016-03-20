@@ -645,6 +645,14 @@ footer > * {
   vertical-align: top;
 }
 
+#social {
+  display: inline-block;
+  float: left;
+}
+#social > * {
+  vertical-align: top;
+}
+
 @media screen and (max-width: 480px) {
   .unit-panel, .util {
     display: none;
