@@ -48,7 +48,7 @@ var config = { n: 0 };
  * @param {boolean} [defVal=false] - デフォルト値
  */
 config.YN = function( text, defVal ) {
-  //this.text = text;
+  this.text = text;
   this.value = defVal||false;
   var name = 'TN'+config.n++;
   var $input = $('<input>').prop({
@@ -110,6 +110,7 @@ config.Radio.prototype.set = function( value ) {
  * @param {number} [defVal=min] - デフォルト値
  */
 config.Quantity = function( text, min, max, defVal ) {
+  this.text = text;
   this.$label = $('<p>').addClass('config-label').text( text );
   var $input = $('<input>').prop({
     type: 'number',
@@ -140,6 +141,9 @@ var option = {
     '敗北としてカウント',
     '勝敗をランダムに決定',
   ], 1 ),
+  countPerMatch: new config.Radio( '勝数カウント', [
+    'マッチ勝数(3回勝負ごと)', '総合勝数(1回勝負ごと)'
+  ]),
   ignoreUserType: new config.Radio( 'タイプ一致ボーナス', [
     '勝敗判定に使用する',
     '無視する',
@@ -198,6 +202,7 @@ for ( var t in option ) {
         click: function(){
           var $this = $(this);
           $this.parent().siblings('td').empty().removeClass( TYPECLASS + 'error' );
+          $expect.empty().removeClass('win lose');
         }
       })
     );
@@ -255,15 +260,21 @@ var match = function( p1, u1, p2, u2 ) {
     for ( let j = 0; j < 3; j++ ) {
       score += battle( p1, u1[3*i+j], p2, u2[3*i+j] );
     }
-    if ( score > 0 ) win++;
-    else if ( score < 0 ) win--;
-    if ( win >= 2 ) {
-      return true;
-    }
-    else if ( win <= -2 ){
-      return false;
-    }
+    
+    if ( score > 0 ) {
+      win++;
+    } else if ( option.countPerMatch.value === 1 ) {
+      if ( score === 0 ) {
+        switch ( option.countDrawAs.value ) {
+        case 0: win++; break;
+        case 2: win += Math.round( Math.random() ); break;
+        }
+      }
+    } else if ( score < 0 ) win--;
+    
+    if ( option.countPerMatch.value === 0 && Math.abs( win ) >= 2 ) return win > 0;
   }
+  if ( option.countPerMatch.value === 1 ) return Math.max( win, 0 );
   if ( win !== 0 ) return win > 0;
   switch( option.countDrawAs.value ){
   case 0: return true;
@@ -540,7 +551,9 @@ $body.on({ click: closeSelect });
     return new Promise( resolve => {
       var result = { unit: u, win: 0 };
       for ( let i = 0, u2; u2 = u2s[i]; i++ ) {
-        if( match( manager[0], u, manager[1], u2 ) ) result.win++;
+        let win = match( manager[0], u, manager[1], u2 );
+        if ( option.countPerMatch.value === 1 ) result.win += win;
+        else if ( win ) result.win++;
       }
       results.push( result );
       if ( option.showProgress.value ) {
@@ -564,9 +577,7 @@ $body.on({ click: closeSelect });
     }
     return p.then( () => {
       results.sort( function(a,b){ return b.win-a.win; } );
-      let i = 0;
-      let n = 0;
-      let rank = 0;
+      let i = 0, n = 0, rank = 0;
       let max = parseInt( option.resultDisplay.value ) || 10;
       let honored = [];
       let fixed = Math.max( manager[0].fixed.length, manager[1].fixed.length );
@@ -585,10 +596,10 @@ $body.on({ click: closeSelect });
         i++; n++;
       }
       if ( window.ga ){
-        ga( 'send', 'event', 'complete', 'fixed', 'you', manager[0].fixed.length );
-        ga( 'send', 'event', 'complete', 'fixed', 'rival', manager[1].fixed.length );
+        ga( 'send', 'event', 'fixed', 'you', manager[0].fixed.length );
+        ga( 'send', 'event', 'fixed', 'rival', manager[1].fixed.length );
         for ( let k in option ) {
-          if ( option.hasOwnProperty( k ) ) ga( 'send', 'event', 'complete', 'config', k, option[k].value );
+          if ( option.hasOwnProperty( k ) ) ga( 'send', 'event', 'config', option[k].text, option[k].value );
         }
         if ( window.performance ) {
           let code = `${manager[0].fixed.length}:${manager[1].fixed.length}`;
