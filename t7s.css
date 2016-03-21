@@ -405,10 +405,6 @@ section h3 {
   width: 430px;
 }
 
-#known {
-  width: 220px;
-}
-
 /* 結果表示欄 */
 .result-unit {
   width: 86px;
@@ -421,7 +417,7 @@ section h3 {
   width: 32px;
 }
 #result .rate {
-  width: 64px;
+  width: 60px;
 }
 #result .util {
   width: 58px;
@@ -495,9 +491,13 @@ section h3 {
 #known-unit-wrapper {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: center;
 }
 
+#known {
+  width: 220px;
+  text-align: center;
+}
 #known td {
   cursor: pointer;
 }
@@ -551,6 +551,8 @@ section h3 {
   position: absolute;
   display: table;
   text-align: center;
+  box-sizing: border-box;
+  overflow-y: scroll;
 }
 
 #close-config {
@@ -657,10 +659,11 @@ footer > * {
 }
 #social > * {
   vertical-align: top;
+  display: inline-table;
 }
 
 @media screen and (max-width: 480px) {
-  .unit-panel, .util {
+  .unit-panel, .util, #version, .footnote {
     display: none;
   }
 
@@ -668,7 +671,23 @@ footer > * {
     font-size: 25px;
   }
 
-  #main-contents, #result-wrapper > * {
+  #main-contents,
+  #result-wrapper > *,
+  #config {
     width: 375px;
+  }
+
+  .config-content {
+    display: flex;
+    flex-wrap: wrap;
+    width: 350px;
+  }
+  .config-content > * {
+    text-align: left;
+  }
+
+  #config {
+    height: 370px;
+    display: table-cell;
   }
 }

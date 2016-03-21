@@ -379,9 +379,7 @@ section {
   width: 430px;
 }
 
-#known {
-  width: 220px;
-}
+
 
 /* 結果表示欄 */
 .result-unit {
@@ -395,7 +393,7 @@ section {
     }
   }
   .rank { width: 32px; }
-  .rate { width: 64px; }
+  .rate { width: 60px; }
   .util { width: 58px; }
 }
 
@@ -467,12 +465,17 @@ section {
 #known-unit-wrapper {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: center;
 }
 
-#known td {
+#known {
+  width: 220px;
+  text-align: center;
+  td {
     cursor: pointer;
+  }
 }
+
 .expectation {
   float: right;
   cursor: pointer;
@@ -514,6 +517,8 @@ section {
   position: absolute;
   display: table;
   text-align: center;
+  box-sizing: border-box;
+  overflow-y: scroll;
 }
 
 #close-config {
@@ -622,12 +627,29 @@ footer {
   float: left;
   & > * {
     vertical-align: top;
+    display: inline-table;
   }
 }
 
 //スマホ対応
 @media screen and (max-width: 480px) {
-.unit-panel, .util { display: none; }
+.unit-panel, .util, #version, .footnote { display: none; }
 h1 { font-size: 25px; }
-#main-contents, #result-wrapper > * { width: 375px; }
+#main-contents,
+#result-wrapper > *,
+#config { width: 375px; }
+
+.config-content {
+  display: flex;
+  flex-wrap: wrap;
+  width: 350px;
+  & > * {
+    text-align: left;
+  }
+}
+#config {
+  height: 370px;
+  display: table-cell;
+}
+
 }
