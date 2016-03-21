@@ -401,15 +401,14 @@ section h3 {
   flex-wrap: wrap;
 }
 
-#result {
-  width: 430px;
-}
-
 /* 結果表示欄 */
 .result-unit {
   width: 86px;
 }
 
+#result {
+  width: 430px;
+}
 #result tbody td:first-child, #result tbody td:nth-child(10n+1) {
   text-align: right;
 }

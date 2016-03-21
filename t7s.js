@@ -5,7 +5,7 @@
 $(document).ready(() => {
 'use strict';
 
-let version = '1.2.0';
+let version = '1.2.2';
 
 const type = [
   { name: 'ボーカリスト', tag: 'Vo' },
@@ -242,8 +242,8 @@ var battle = function( p1, c1, p2, c2 ) {
   else return 0;
 };
 
-var finishedLive = 0; //指定欄で勝敗が確定した数
 var victory = 0; //指定欄で勝利が確定した数
+var defeat = 0;  //指定欄で敗北が確定した数
 
 /**
  * 1vs1を3回繰り返して1ユニット分の勝敗を確定する
@@ -254,8 +254,8 @@ var victory = 0; //指定欄で勝利が確定した数
  * @return {boolean} 勝敗
  */
 var match = function( p1, u1, p2, u2 ) {
-  var win = victory;
-  for ( let i = finishedLive; i < 3; i++ ) {
+  var win = victory - defeat;
+  for ( let i = victory + defeat; i < 3; i++ ) {
     let score = 0;
     for ( let j = 0; j < 3; j++ ) {
       score += battle( p1, u1[3*i+j], p2, u2[3*i+j] );
@@ -363,6 +363,7 @@ Manager.prototype = {
     var unit = JSON.stringify({ type: this.type, unit: this.unit });
     window.localStorage.setItem( 'unit'+n, unit );
     pline( `スロット${n+1}にユニットデータを保存しました` );
+    if ( window.ga ) ga( 'send', 'event', 'save', n+1 );
   },
   /**
    * ユニットデータがブラウザに保存されていたならそれを読みだす
@@ -475,7 +476,7 @@ $body.on({ click: closeSelect });
         manager[1].input();
         $progress.show();
         victory = $('.win').length;
-        finishedLive = $('.lose').length + victory;
+        defeat = $('.lose').length;
         setTimeout( resolve, 0 );
       }).then( isReadyToCalc ).then( () => {
         return bruteforce( manager[0], manager[1] );
