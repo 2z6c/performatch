@@ -150,7 +150,7 @@ var option = {
   ]),
   resultDisplay: new config.Quantity( '結果の表示数', 1, 1680, 8 ),
   resetWhenRegroup: new config.YN( '編成変更時に確定枠をリセットする', true ),
-  omitDuplicatedResults: new config.YN( 'ユニットの並び替えで重複する結果を除外', false ),
+  omitDuplicatedResults: new config.YN( 'ステージを並び替えて重複する結果を除外', false ),
   showProgress: new config.YN( '計算中プログレスバーを表示する', true ),
   messageFadeTime: new config.Quantity( 'メッセージの表示時間(秒)', 0, Infinity, 1 ),
 };
@@ -167,7 +167,7 @@ for ( var t in option ) {
   let $fixerTemplate = $('.known-unit');
   for ( let i = 0; i < 3; i++ ) {
     let $fixer = $fixerTemplate.clone().removeClass('template').appendTo( $known );
-    let $caption = $fixer.find('.unit-caption').text( ['1st','2nd','3rd'][i] + ' Unit' );
+    let $caption = $fixer.find('.unit-caption').text( ['1st','2nd','3rd'][i] + ' Stage' );
     let $expect = $('<span>').addClass('expectation').appendTo( $caption ).on({
       click: function(e){
         var $this = $(this);
@@ -503,7 +503,7 @@ $body.on({ click: closeSelect });
         let fixed = manager[i].fixed.length;
         if ( fixed % 3 > 0 ) {
           manager[i].$known.eq(fixed).addClass('error');
-          return reject( '確定枠はユニット(3人)単位で指定してください。' );
+          return reject( '確定枠はステージ(3人)単位で指定してください。' );
         }
       }
       resolve();
@@ -638,10 +638,10 @@ $body.on({ click: closeSelect });
     return $('<a>').text(n)
       .on({click: copyResult.bind( null, n, $tr )})
       .addClass('copy button')
-      .attr('title', `${['1st','2nd','3rd'][n-1]}ユニットの並びを確定欄に反映`);
+      .attr('title', `${['1st','2nd','3rd'][n-1]}ステージの並びを確定欄に反映`);
   };
   /**
-   * ユニット順の重複をチェック
+   * ステージ順の重複をチェック
    * @param {Array} a - チェックする配列
    * @param {Array} tests - テストする配列の配列
    * @param {number} f - 固定枠の長さ
@@ -663,7 +663,7 @@ $body.on({ click: closeSelect });
 
 /**
  * 結果を確定欄にコピーする
- * @param {number} n - コピーするユニット番号
+ * @param {number} n - コピーするステージ番号
  * @param {$} $tr - 結果の行
  */
 var copyResult = function( n, $tr ){
