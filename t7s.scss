@@ -497,6 +497,8 @@ section {
   background: rgba(0, 0, 0, 0.1);
 }
 
+$scrollbar: -webkit-scrollbar;
+
 #config {
   margin: auto;
   padding: 8px;
@@ -513,6 +515,18 @@ section {
   text-align: center;
   box-sizing: border-box;
   overflow-y: scroll;
+  &::#{$scrollbar} {
+    width: 10px;
+    background: rgba( #fff, 0.9 );
+    border-left: 1px solid $darkcyan;
+    box-sizing: border-box;
+  }
+  &::#{$scrollbar}-thumb {
+    background: $blue;
+  }
+  &::#{$scrollbar}-button {
+    display: none;
+  }
 }
 
 #close-config {
@@ -643,6 +657,7 @@ h1 { font-size: 25px; }
 }
 #config {
   height: 370px;
+  max-height: 50%;
   display: table-cell;
 }
 

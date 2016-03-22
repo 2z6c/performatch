@@ -553,6 +553,18 @@ section h3 {
   box-sizing: border-box;
   overflow-y: scroll;
 }
+#config::-webkit-scrollbar {
+  width: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #0babf6;
+  box-sizing: border-box;
+}
+#config::-webkit-scrollbar-thumb {
+  background: #0babf6;
+}
+#config::-webkit-scrollbar-button {
+  display: none;
+}
 
 #close-config {
   position: absolute;
@@ -687,6 +699,7 @@ footer > * {
 
   #config {
     height: 370px;
+    max-height: 50%;
     display: table-cell;
   }
 }
