@@ -370,12 +370,16 @@ section h3 {
   margin: 3px;
 }
 
+#user-data-list {
+  width: 100%;
+}
+
 .no-data {
   background: #888;
   pointer-events: none;
 }
 
-#rival-template .button {
+.unit-panel li > * {
   width: 100px;
 }
 
@@ -536,7 +540,7 @@ section h3 {
   background: rgba(0, 0, 0, 0.1);
 }
 
-#config {
+.modal {
   margin: auto;
   padding: 8px;
   top: 200%;
@@ -553,20 +557,20 @@ section h3 {
   box-sizing: border-box;
   overflow-y: scroll;
 }
-#config::-webkit-scrollbar {
+.modal::-webkit-scrollbar {
   width: 10px;
   background: rgba(255, 255, 255, 0.9);
   border-left: 1px solid #00c3dd;
   box-sizing: border-box;
 }
-#config::-webkit-scrollbar-thumb {
+.modal::-webkit-scrollbar-thumb {
   background: #0babf6;
 }
-#config::-webkit-scrollbar-button {
+.modal::-webkit-scrollbar-button {
   display: none;
 }
 
-#close-config {
+.close-button {
   position: absolute;
   right: 0;
   bottom: 102%;
@@ -584,11 +588,12 @@ section h3 {
   cursor: pointer;
 }
 
-#config p {
+.modal p {
   display: inline-table;
   margin: 0 10px 0 0;
 }
 
+.modal label,
 .config-label {
   width: 250px;
   text-align: right;

@@ -343,12 +343,16 @@ section {
   margin: 3px;
 }
 
+#user-data-list {
+  width: 100%;
+}
+
 .no-data {
   background: #888;
   pointer-events: none;
 }
 
-#rival-template .button {
+.unit-panel li > * {
   width: 100px;
 }
 
@@ -499,7 +503,7 @@ section {
 
 $scrollbar: -webkit-scrollbar;
 
-#config {
+.modal {
   margin: auto;
   padding: 8px;
   top: 200%;
@@ -529,7 +533,7 @@ $scrollbar: -webkit-scrollbar;
   }
 }
 
-#close-config {
+.close-button {
   position: absolute;
   right: 0;
   bottom: 102%;
@@ -547,11 +551,12 @@ $scrollbar: -webkit-scrollbar;
   cursor: pointer;
 }
 
-#config p {
+.modal p {
   display: inline-table;
   margin: 0 10px 0 0;
 }
 
+.modal label,
 .config-label {
   width: 250px;
   text-align: right;

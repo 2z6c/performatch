@@ -45,6 +45,7 @@
     <script src="https://apis.google.com/js/platform.js" async defer>{lang: 'ja'}</script>
   </head>
   <body>
+    <!-- Facebook share button -->
     <div id="fb-root"></div>
     <script>(function(d, s, id) {
       var js, fjs = d.getElementsByTagName(s)[0];
@@ -53,6 +54,7 @@
       js.src = "//connect.facebook.net/ja_JP/sdk.js#xfbml=1&version=v2.5";
       fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));</script>
+    <!-- /Facebook share button -->
     <div id="main-contents">
     <span id="subtitle">Tokyo 7th Sisters:// PERFORMANCE MATCH Simulator;</span>
     <h1>ナナシス パフォーマッチシミュレータ</h1>
@@ -62,6 +64,11 @@
           <div class="unit-panel">
             <div id="save-slot">
               <h3>ユニットデータ</h3>
+              <ul>
+              <li><a class="button" id="save-unit">SAVE</a></li>
+              <li><select id="unit-data-list">
+              </select></li>
+              <li><a class="button" id="delete-unit">DELETE</a></li>
             </div>
           </div>
           <table class="unit">
@@ -159,9 +166,24 @@
       </ul>
     </section>
     </div>
+    <!-- モーダルウィンドウ -->
     <div id="overlay">
-      <div class="config" id="config">
-        <div id="close-config">×</div>
+      <div class="modal" id="config">
+        <a class="close-button"></a>
+      </div>
+      <div class="modal" id="save-dialog">
+        <div class="close-button"></div>
+        <p>
+          <label for="input-save-name">ユニット名を入力<label><br>
+          <input type="text" id="input-save-name"></input>
+          <a class="button">保存</a><br>
+          <span id="save-error"></span>
+        </p>
+      </div>
+      <div class="modal" id="simple-dialog">
+        <a class="close-button"></a>
+        <div id="dialog-text"></div>
+        <a class="button" id="dialog-ok">OK</a><a class="button">キャンセル</a>
       </div>
     </div>
     <div id="progress"><div id="bar"></div></div>

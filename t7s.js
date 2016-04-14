@@ -5,7 +5,7 @@
 $(document).ready(() => {
 'use strict';
 
-let version = '1.2.2';
+let version = '1.3.0';
 
 const type = [
   { name: 'ボーカリスト', tag: 'Vo' },
@@ -18,6 +18,8 @@ const type = [
 
 const TYPECLASS = 'Vo Va Mo Pl Da NT ';
 
+var unitSaveSlot = {};
+
 //$オブジェクトのキャッシュ
 var $body = $('body');
 var $config = $('#config');
@@ -28,6 +30,7 @@ var $known = $('#known-unit-wrapper');
 var $you = $('#you');
 var $rival = $('#rival');
 var $pline = $('#message');
+var $savelist = $("#unit-data-list");
 
 /** 昇順並び替え用コールバック */
 var asc = (a,b) => a-b;
@@ -357,26 +360,30 @@ Manager.prototype = {
   },
   /**
    * ユニットデータをブラウザに保存する
-   * @param {number} n - スロット番号
+   * @param {string} id - スロットID
    */
-  save: function(n){
-    var unit = JSON.stringify({ type: this.type, unit: this.unit });
-    window.localStorage.setItem( 'unit'+n, unit );
-    pline( `スロット${n+1}にユニットデータを保存しました` );
-    if ( window.ga ) ga( 'send', 'event', 'save', n+1 );
+  save: function( id ){
+    if ( !unitSaveSlot.hasOwnProperty(id) ) {
+      $('<option>').text(id).prop({ val: id }).appendTo( $savelist );
+    }
+    unitSaveSlot[id] = { type: this.type, unit: this.unit };
+    var json = JSON.stringify(unitSaveSlot);
+    window.localStorage.setItem( 'unit', json );
+    window.localStorage.setItem( 'default_unit', id );
+    pline( `[${id}]を保存しました` );
   },
   /**
    * ユニットデータがブラウザに保存されていたならそれを読みだす
    */
-  load: function(n){
-    var json = window.localStorage.getItem( 'unit'+ n );
-    if ( json ) {
-      var data = JSON.parse( json );
+  load: function( id ){
+    let data = unitSaveSlot[id];
+    if ( data ) {
       this.type = data.type;
-      this.unit = data.unit||[0,0,0,0,0,0,0,0,0];
+      this.unit = [].concat(data.unit||[0,0,0,0,0,0,0,0,0]);
       this.output();
+      window.localStorage.setItem( 'default_unit', id );
     } else {
-      throw( `スロット${n+1}にはユニットデータがありません` );
+      throw( `[${id}]にはユニットデータがありません` );
     }
   },
 };
@@ -745,56 +752,6 @@ var makeUniqueUnits = function( m, f ) {
   return pool;
 };
 
-//ユニットセーブ/ロードボタンの初期化
-{
-  let $slots = $('<ul>').appendTo('#save-slot');
-  let nSlot = 5;
-  for ( let i = 0; i < nSlot; i++ ) {
-    let unitData = window.localStorage.getItem( 'unit'+i );
-    let $li = $('<li>').appendTo( $slots );
-    //セーブボタン
-    let $save = $('<a>').addClass('save button').on({
-      click: (i => (() => {
-        $save.removeClass('no-data');
-        $load.data('unit', { type: manager[0].type, unit: manager[0].unit }).removeClass('no-data');
-        manager[0].save(i);
-      }))(i)
-    }).text(`SAVE ${i+1}`).appendTo( $li );
-    //ロードボタン
-    let $load = $('<a>').addClass('load button').on({
-      click: manager[0].load.bind( manager[0], i ),
-      mouseover: () => {
-        showMiniUnit( $load, $load.data( 'unit' ) );
-      },
-      mouseout: () => {
-        $('#mini-unit').remove();
-      }
-    }).text(`LOAD ${i+1}`).appendTo( $li );
-    if ( unitData ) {
-      let data = JSON.parse( unitData );
-      $load.data('unit', data );
-    } else {
-      $load.addClass('no-data');
-    }
-  }
-  /**
-   * 保存済みのユニットをツールチップで表示するハンドラ
-   * @param {$} $parent - 呼び出した要素
-   * @param {Object} data - ユニットデータ
-   */
-  let showMiniUnit = function( $parent, data ){
-    var $mini = $('<table id="mini-unit">').addClass( type[data.type].tag ).appendTo( $parent );
-    $('<caption>').appendTo( $mini ).text( type[data.type].name );
-    for ( let i = 0; i < 3; i++ ) {
-      let $tr = $('<tr>').appendTo( $mini );
-      for ( let j = 0; j < 3; j++ ) {
-        let tag = type[data.unit[3*i+j]].tag;
-        let $td = $('<td>').appendTo( $tr ).addClass( tag ).text( tag );
-      }
-    }
-  }
-}
-
 //テンプレ編成ボタンを作成するブロック
 {
   let template = [{
@@ -884,14 +841,15 @@ var pline = function( text ){
     $modal.fadeOut({ easing: 'easeInExpo' });
     if ( onClose ) onClose();
   };
-  //コンフィグウィンドウ関連
   $modal.on({
     click: closeModal
   }).children().on({
     click: e => { e.stopPropagation(); }
-  }).children().first().on({
+  });
+  $('.close-button').text('×').on({
     click: closeModal
   });
+  //コンフィグウィンドウ関連
   $('#config-button').on({
     click: () => {
       openModal( $config, () => {
@@ -905,6 +863,70 @@ var pline = function( text ){
       });
     }
   });
+  //セーブ関連
+  {
+    let $input = $('#input-save-name').on({
+      click: () => { $input.select(); return false; },
+      focus: () => { $input.select(); },
+    });
+    let $save = $('#save-dialog');
+    $save.find('.button').on({ click: () => {
+      let key = $input.val();
+      manager[0].save( key );
+      $savelist.val( key );
+      closeModal();
+    }});
+    $('#save-unit').addClass('save').on({
+      click: () => {
+        openModal( $save, () => 0 );
+      }
+    });
+    let $info = $('#simple-dialog');
+    let $text = $('#dialog-text')
+    let $ok = $('#dialog-ok');
+    $info.find('.button').on({click: closeModal});
+
+    $savelist.on({
+      change: () => {
+        $input.val( $savelist.val() );
+        manager[0].load( $savelist.val() );
+      }
+    });
+    let deleteSave = ( key, $option ) => {
+      $option.remove();
+      delete unitSaveSlot[key];
+      window.localStorage.setItem( 'unit', JSON.stringify( unitSaveSlot ) );
+      window.localStorage.setItem( 'default_unit', $savelist.children().first().val() );
+    };
+    $('#delete-unit').on({
+      click: () => {
+        let $selected = $savelist.find('option:selected');
+        let key = $selected.text();
+        $text.text(`本当に[${key}]を削除してもよろしいですか？`);
+        $ok.off('.delete').on( 'click.delete', () => {
+          pline(`[${key}]を削除しました。`)
+          deleteSave( key, $selected );
+        });
+        openModal( $info, ()=>0 );
+      }
+    });
+    /**
+     * 保存済みのユニットをツールチップで表示するハンドラ
+     * @param {$} $parent - 呼び出した要素
+     * @param {Object} data - ユニットデータ
+     */
+    let showMiniUnit = function( $parent, data ){
+      var $mini = $('<table id="mini-unit">').addClass( type[data.type].tag ).appendTo( $parent );
+      $('<caption>').appendTo( $mini ).text( type[data.type].name );
+      for ( let i = 0; i < 3; i++ ) {
+        let $tr = $('<tr>').appendTo( $mini );
+        for ( let j = 0; j < 3; j++ ) {
+          let tag = type[data.unit[3*i+j]].tag;
+          let $td = $('<td>').appendTo( $tr ).addClass( tag ).text( tag );
+        }
+      }
+    }
+  }
 }
 
 //初期化処理
@@ -913,9 +935,22 @@ Promise.resolve(0).then( () => {
   $('#unable-js').remove();
   $('#unit-area').show();
   $('#version').text( `ver. ${version}` );
-  manager[0].load(0);
+  //データを読みだす
+  let json = window.localStorage.getItem( 'unit' );
+  if ( json ) {
+    let data = JSON.parse( json );
+    for ( let k in data ) {
+      unitSaveSlot[k] = data[k];
+      $('<option>').text(k).prop({ val: k }).appendTo( $savelist );
+    }
+    let slot = window.localStorage.getItem( 'default_unit' );
+    if ( ( slot !== void 0 ) && unitSaveSlot[slot] ) {
+      manager[0].load(slot);
+    }
+  }
 }).catch( e => {
   console.debug( '初期化処理に失敗しました', e );
+  window.localStorage.clear();
 }).then( () => {
   //コンフィグファイルの読み込み
   var json = window.localStorage.getItem( 'config' );
