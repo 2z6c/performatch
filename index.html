@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="ja">
   <head>
-    <title>ナナシス パフォーマッチシミュレータ</title>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta charset="UTF-8">
+    <title>ナナシス パフォーマッチシミュレータ</title>
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <meta name="keywords" content="ナナシス,Tokyo 7th シスターズ,Tokyo 7th Sisters,t7s,パフォーマッチ">
     <meta name="description" content="Tokyo 7th シスターズのパフォーマッチイベントで最も勝率の高いユニット順を総当りで計算します。">
@@ -65,10 +64,11 @@
             <div id="save-slot">
               <h3>ユニットデータ</h3>
               <ul>
-              <li><a class="button" id="save-unit">SAVE</a></li>
-              <li><select id="unit-data-list">
-              </select></li>
-              <li><a class="button" id="delete-unit">DELETE</a></li>
+                <li><a class="button" id="save-unit">SAVE</a></li>
+                <li><select id="unit-data-list">
+                </select></li>
+                <li><a class="button" id="delete-unit">DELETE</a></li>
+              </ul>
             </div>
           </div>
           <table class="unit">
@@ -173,17 +173,20 @@
       </div>
       <div class="modal" id="save-dialog">
         <div class="close-button"></div>
-        <p>
-          <label for="input-save-name">ユニット名を入力<label><br>
-          <input type="text" id="input-save-name"></input>
+        <div class="dialog-content">
+          <label for="input-save-name">ユニット名を入力</label><br>
+          <input type="text" id="input-save-name">
           <a class="button">保存</a><br>
           <span id="save-error"></span>
-        </p>
+        </div>
       </div>
       <div class="modal" id="simple-dialog">
         <a class="close-button"></a>
-        <div id="dialog-text"></div>
-        <a class="button" id="dialog-ok">OK</a><a class="button">キャンセル</a>
+        <div class="dialog-content">
+          <div id="dialog-text"></div>
+          <a class="button" id="dialog-ok">OK</a>
+          <a class="button">キャンセル</a>
+        </div>
       </div>
     </div>
     <div id="progress"><div id="bar"></div></div>

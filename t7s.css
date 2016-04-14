@@ -605,12 +605,14 @@ section h3 {
   text-align: left;
 }
 
+.dialog-content,
 .config-content {
   margin-bottom: 7px;
   border: 1px solid #fff;
   background: rgba(255, 255, 255, 0.8);
   position: relative;
 }
+.dialog-content:after,
 .config-content:after {
   content: '';
   position: absolute;

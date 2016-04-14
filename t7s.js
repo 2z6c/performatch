@@ -5,7 +5,7 @@
 $(document).ready(() => {
 'use strict';
 
-let version = '1.3.0';
+let version = '1.3.1';
 
 const type = [
   { name: 'ボーカリスト', tag: 'Vo' },
@@ -882,7 +882,7 @@ var pline = function( text ){
       }
     });
     let $info = $('#simple-dialog');
-    let $text = $('#dialog-text')
+    let $text = $('#dialog-text');
     let $ok = $('#dialog-ok');
     $info.find('.button').on({click: closeModal});
 
@@ -910,24 +910,8 @@ var pline = function( text ){
         openModal( $info, ()=>0 );
       }
     });
-    /**
-     * 保存済みのユニットをツールチップで表示するハンドラ
-     * @param {$} $parent - 呼び出した要素
-     * @param {Object} data - ユニットデータ
-     */
-    let showMiniUnit = function( $parent, data ){
-      var $mini = $('<table id="mini-unit">').addClass( type[data.type].tag ).appendTo( $parent );
-      $('<caption>').appendTo( $mini ).text( type[data.type].name );
-      for ( let i = 0; i < 3; i++ ) {
-        let $tr = $('<tr>').appendTo( $mini );
-        for ( let j = 0; j < 3; j++ ) {
-          let tag = type[data.unit[3*i+j]].tag;
-          let $td = $('<td>').appendTo( $tr ).addClass( tag ).text( tag );
-        }
-      }
-    }
-  }
-}
+  } //セーブ関連ブロック
+} //モーダル関連ブロック
 
 //初期化処理
 Promise.resolve(0).then( () => {
