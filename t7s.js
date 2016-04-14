@@ -366,7 +366,7 @@ Manager.prototype = {
     if ( !unitSaveSlot.hasOwnProperty(id) ) {
       $('<option>').text(id).prop({ val: id }).appendTo( $savelist );
     }
-    unitSaveSlot[id] = { type: this.type, unit: this.unit };
+    unitSaveSlot[id] = { type: this.type, unit: [].concat(this.unit) };
     var json = JSON.stringify(unitSaveSlot);
     window.localStorage.setItem( 'unit', json );
     window.localStorage.setItem( 'default_unit', id );
