@@ -632,6 +632,32 @@ section h3 {
   font-size: 13.5px;
 }
 
+/* メモ */
+.memo {
+  background: #8ff5fe;
+  opacity: .8;
+  border: 2px solid #50c2f8;
+  display: table;
+  position: absolute;
+  box-shadow: 2px 2px 2px #000;
+  corsor: pointer;
+  left: 30px;
+  top: 30px;
+}
+.memo textarea {
+  width: 260px;
+  height: 80px;
+  margin: 2px;
+}
+.memo h2 {
+  font-family: 'Play', sans-serif;
+  text-size: 16px;
+  color: #fff;
+  padding: 2px 10px;
+  margin: 0;
+  background: #50c2f8;
+}
+
 /* プログレスバー */
 #progress, #bar {
   top: 0;

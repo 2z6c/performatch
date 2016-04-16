@@ -865,15 +865,16 @@ var pline = function( text ){
   });
   //セーブ関連
   {
+    let onFocus = () => { $input.select(); return false; };
     let $input = $('#input-save-name').on({
-      click: () => { $input.select(); return false; },
-      focus: () => { $input.select(); },
+      click: onFocus,
+      focus: onFocus,
     });
     let $save = $('#save-dialog');
     $save.find('.button').on({ click: () => {
       let key = $input.val();
       manager[0].save( key );
-      $savelist.val( key );
+      enableSaveList();
       closeModal();
     }});
     $('#save-unit').addClass('save').on({
@@ -892,13 +893,27 @@ var pline = function( text ){
         manager[0].load( $savelist.val() );
       }
     });
+    /** 
+     * 保存したユニットデータを削除する
+     * @param {string} key - ユニット名
+     * @param {$} $option - 対応するoption要素
+     */
     let deleteSave = ( key, $option ) => {
       $option.remove();
       delete unitSaveSlot[key];
       window.localStorage.setItem( 'unit', JSON.stringify( unitSaveSlot ) );
       window.localStorage.setItem( 'default_unit', $savelist.children().first().val() );
+      if ( Object.keys( unitSaveSlot ).length === 0 ) disableSaveList();
     };
-    $('#delete-unit').on({
+    var disableSaveList = () => {
+        $savelist.attr({disabled:'disabled'});
+        $delete.addClass('no-data');
+    };
+    var enableSaveList = () => {
+        $savelist.removeAttr('disabled');
+        $delete.removeClass('no-data');
+    };
+    let $delete = $('#delete-unit').on({
       click: () => {
         let $selected = $savelist.find('option:selected');
         let key = $selected.text();
@@ -913,19 +928,45 @@ var pline = function( text ){
   } //セーブ関連ブロック
 } //モーダル関連ブロック
 
+//メモ機能
+{
+  let n = 0;
+  let $memo = $('.memo').clone().removeClass('template');
+  $('.memo').remove();
+  let onFocus = function(){
+    let $this = $(this);
+    $this.off('.initial').empty();
+  };
+  $memo.find('textarea').text(
+    '簡易メモです。\n' +
+    'このページを閉じると内容は失われます。\n' +
+    '単色構成のユーザー名の記録などに使うと便利だと思います。'
+  ).on({
+    'click.initial': onFocus,
+    'focus.initial': onFocus,
+  });
+  $('#open-memo').on({ click: () => {
+    n++;
+    let $close = $('<div>').addClass('close-button').on({click: () => { $('#memo-'+n).remove(); } }).text('×');
+    $memo.clone(true).appendTo($body).attr({id: `memo-${n}`}).draggable()
+      .append( $close ).find('h2').text(`Note ${n}`);
+  }});
+}
+
 //初期化処理
 Promise.resolve(0).then( () => {
   //javascript無効状態の警告文を消す
   $('#unable-js').remove();
   $('#unit-area').show();
   $('#version').text( `ver. ${version}` );
-  //データを読みだす
+  //ユニットデータを読みだす
   let json = window.localStorage.getItem( 'unit' );
   if ( json ) {
     let data = JSON.parse( json );
     for ( let k in data ) {
       unitSaveSlot[k] = data[k];
       $('<option>').text(k).prop({ val: k }).appendTo( $savelist );
+      enableSaveList();
     }
     let slot = window.localStorage.getItem( 'default_unit' );
     if ( ( slot !== void 0 ) && unitSaveSlot[slot] ) {

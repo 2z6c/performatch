@@ -62,12 +62,13 @@
         <div id="you" class="team">
           <div class="unit-panel">
             <div id="save-slot">
-              <h3>ユニットデータ</h3>
+              <h3>編集補助</h3>
               <ul>
-                <li><a class="button" id="save-unit">SAVE</a></li>
-                <li><select id="unit-data-list">
+                <li><a class="button" id="save-unit" title="現在のユニット編成に名前をつけてブラウザに保存します。">SAVE</a></li>
+                <li><select id="unit-data-list" disabled="disabled">
                 </select></li>
-                <li><a class="button" id="delete-unit">DELETE</a></li>
+                <li><a class="button no-data" id="delete-unit" title="ブラウザに保存されたユニット編成を消去します。">DELETE</a></li>
+                <li><a class="button" id="open-memo" title="簡易メモを開きます。">NOTE</a></li>
               </ul>
             </div>
           </div>
@@ -145,7 +146,7 @@
         <li>上のユニット編成欄で自分と相手のユニット属性をそれぞれ選択します。<br>(背景クリックでチーム属性も変更)</li>
         <li>[VS]ボタンを押すと計算が開始され、勝率が高い順に並べられたユニットの組み合わせが表示されます。</li>
         <li>確定欄に1戦目の結果やスパイコニーさんの偵察結果を入れると精度が上がります。</li>
-        <li>各ステージの確定欄を埋めるとシミュレートされた勝敗が右上に表示されます。<br>実際の勝敗結果と異なる場合はクリックすることで切り替えられ、計算結果に反映されます。</li>
+        <li>各ステージの確定欄を埋めるとそのステージの勝敗予想が右上に表示されます。<br>実際の勝敗結果と異なる場合はクリックすることで切り替えられ、計算結果に反映されます。</li>
         <li>あくまで近似計算による推定であり、全く同じ並びでも勝敗結果が実際のものと異なる場合があります。<br>ご利用は自己責任で。</li>
         <li>マシンスペック次第で計算に時間がかかります。待ってください。</li>
         <li class="caution" id="unable-js">javascriptが無効になっているか、非対応のブラウザです。</li>
@@ -190,7 +191,12 @@
       </div>
     </div>
     <div id="progress"><div id="bar"></div></div>
-    <div id="message">
+    <div id="message"></div>
+    <!-- メモテンプレート -->
+    <div id="memo-0" class="memo template">
+      <h2>Note</h2>
+      <textarea>
+      </textarea>
     </div>
     <footer>
       <div id="social">

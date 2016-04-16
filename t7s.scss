@@ -594,6 +594,32 @@ $scrollbar: -webkit-scrollbar;
   font-size: 13.5px;
 }
 
+/* メモ */
+.memo {
+  background: $cyan;
+  opacity: .8;
+  border: 2px solid $lightblue;
+  display: table;
+  position: absolute;
+  box-shadow: 2px 2px 2px #000;
+  corsor: pointer;
+  left: 30px;
+  top: 30px;
+  textarea {
+    width: 260px;
+    height: 80px;
+    margin: 2px;
+  }
+  h2 {
+    font-family: 'Play', sans-serif;
+    text-size: 16px;
+    color: #fff;
+    padding: 2px 10px;
+    margin: 0;
+    background: $lightblue;
+  }
+}
+
 /* プログレスバー */
 #progress, #bar {
   @extend %interface;
