@@ -69,6 +69,7 @@
                 </select></li>
                 <li><a class="button no-data" id="delete-unit" title="ブラウザに保存されたユニット編成を消去します。">DELETE</a></li>
                 <li><a class="button" id="open-memo" title="簡易メモを開きます。">NOTE</a></li>
+                <li><a id="reset-all" class="button" title="結果と固定枠をリセットします。">RESET RESULT</a></li>
               </ul>
             </div>
           </div>
@@ -122,7 +123,6 @@
     </section>
     <section id="known">
       <h2>確定メンバー</h2>
-      <a id="reset-all" class="button">結果と固定枠をリセット</a>
       <div id="known-unit-wrapper">
         <div class="known-unit template">
           <div class="unit-caption">1st Unit</div>
@@ -189,15 +189,16 @@
           <a class="button">キャンセル</a>
         </div>
       </div>
+      <div class="modal" id="memo">
+        <a class="close-button"></a>
+        <textarea>
+        </textarea>
+        <a class="button" id="save-memo">メモの内容をブラウザに保存</a>
+        <a class="button" id="delete-memo">全消去</a>
+      </div>
     </div>
     <div id="progress"><div id="bar"></div></div>
     <div id="message"></div>
-    <!-- メモテンプレート -->
-    <div id="memo-0" class="memo template">
-      <h2>Note</h2>
-      <textarea>
-      </textarea>
-    </div>
     <footer>
       <div id="social">
         <a href="https://twitter.com/share" class="twitter-share-button" data-lang="ja">ツイート</a>

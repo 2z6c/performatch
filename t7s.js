@@ -5,7 +5,7 @@
 $(document).ready(() => {
 'use strict';
 
-let version = '1.3.1';
+let version = '1.4.0';
 
 const type = [
   { name: 'ボーカリスト', tag: 'Vo' },
@@ -38,6 +38,32 @@ var asc = (a,b) => a-b;
 var fact = function( n ) {
   return ( n <= 0 ) ? 1 : ( n * fact( n-1 ) );
 };
+
+//モバイル用タップイベント
+let tap = 'click';
+if ( 'ontouchstart' in window ) {
+  let tapping = false;
+  tap = 'tap';
+  $(document).on({
+    touchstart: () => { tapping = true; },
+    touchmove: () => { tapping = false; }
+  });
+  let onTap = function(e){
+    if ( !tapping ) return;
+    tapping = false;
+    $.event.dispatch.call(this, $.Event('tap', {
+      originalEvent: e,
+      target: e.target,
+      pageX: e.changedTouches[0].pageX,
+      pageY: e.changedTouches[0].pageY,
+    }));
+    return false;
+  };
+  $.event.special.tap = {
+    setup: function(){ this.addEventListener( 'touchend', onTap, false); },
+    teardown: function(){ this.removeEventListener('touchend', onTap, false); }
+  };
+}
 
 /**
  * コンフィグ名前空間オブジェクト。
@@ -172,14 +198,14 @@ for ( var t in option ) {
     let $fixer = $fixerTemplate.clone().removeClass('template').appendTo( $known );
     let $caption = $fixer.find('.unit-caption').text( ['1st','2nd','3rd'][i] + ' Stage' );
     let $expect = $('<span>').addClass('expectation').appendTo( $caption ).on({
-      click: function(e){
+      [tap]: function(e){
         var $this = $(this);
         $this.toggleClass('win lose')
           .text( ($this.text()==='WIN')?'LOSE':'WIN' );
       }
     });
     $fixer.find('td:not(:last-child)').addClass( 'idol' ).on({
-      click: function(e){
+      [tap]: function(e){
         var $this = $(this);
         selectType( e, t => {
           $this.removeClass('error');
@@ -202,7 +228,7 @@ for ( var t in option ) {
     });
     $fixer.find('td:last-child').append(
       $('<a class="button">').text('Reset').on({
-        click: function(){
+        [tap]: function(){
           var $this = $(this);
           $this.parent().siblings('td').empty().removeClass( TYPECLASS + 'error' );
           $expect.empty().removeClass('win lose');
@@ -408,7 +434,7 @@ var selectType = function( e, callback, withNT ) {
   for ( let i = 0; i < qType; i++ ) {
     let $li = $('<a>').text( type[i].tag ).addClass( type[i].tag ).attr({title:type[i].name});
     $li.on({
-      click: ( i => e => {
+      [tap]: ( i => e => {
         callback( i );
         closeSelect(e);
         return false;
@@ -438,7 +464,7 @@ var changeCellType = function( $cell, t ) {
 
 //チーム属性選択ダイアログを表示
 $manager.on({
-  click: function(e){
+  [tap]: function(e){
     var $this = $(this);
     selectType( e, function( i ){
       var tag = type[i].tag;
@@ -450,7 +476,7 @@ $manager.on({
 }).addClass('Vo').data('type',0);
 //ユニットメンバー選択ダイアログを表示
 $cell.on({
-  click: function(e){
+  [tap]: function(e){
     var $this = $(this);
     if ( option.resetWhenRegroup.value ) resetFixing();
     selectType( e, function( i ){
@@ -466,7 +492,7 @@ $cell.on({
   },
 }).text('Vo').addClass('Vo').data('type',0);
 
-$body.on({ click: closeSelect });
+$body.on({ [tap]: closeSelect });
 
 //総当りを試す一連の処理
 {
@@ -476,7 +502,7 @@ $body.on({ click: closeSelect });
   let barLength = 0;
   let results = [];
   $('#VS').on({
-    click: function(){
+    [tap]: function(){
       new Promise( resolve => {
         $result.empty();
         manager[0].input();
@@ -643,7 +669,7 @@ $body.on({ click: closeSelect });
   //確定枠コピーボタン
   let makeCopyButton = function( n, $tr ){
     return $('<a>').text(n)
-      .on({click: copyResult.bind( null, n, $tr )})
+      .on({[tap]: copyResult.bind( null, n, $tr )})
       .addClass('copy button')
       .attr('title', `${['1st','2nd','3rd'][n-1]}ステージの並びを確定欄に反映`);
   };
@@ -687,7 +713,7 @@ var copyResult = function( n, $tr ){
 
 //リセットボタン
 $('#reset-all').on({
-  click: () => {
+  [tap]: () => {
     $result.empty();
     resetFixing();
   }
@@ -797,7 +823,7 @@ var makeUniqueUnits = function( m, f ) {
   for ( let i = 0; i < template.length; i++ ) {
     let tmp = template[i];
     $('<a>').addClass('button').on({
-      click: () => {
+      [tap]: () => {
         resetFixing();
         tmp.generate( manager[1] );
         manager[1].output();
@@ -842,16 +868,16 @@ var pline = function( text ){
     if ( onClose ) onClose();
   };
   $modal.on({
-    click: closeModal
+    [tap]: closeModal
   }).children().on({
-    click: e => { e.stopPropagation(); }
+    [tap]: e => { e.stopPropagation(); }
   });
   $('.close-button').text('×').on({
-    click: closeModal
+    [tap]: closeModal
   });
   //コンフィグウィンドウ関連
   $('#config-button').on({
-    click: () => {
+    [tap]: () => {
       openModal( $config, () => {
         //ブラウザに設定を保存する
         var data = {};
@@ -867,25 +893,26 @@ var pline = function( text ){
   {
     let onFocus = () => { $input.select(); return false; };
     let $input = $('#input-save-name').on({
-      click: onFocus,
+      [tap]: onFocus,
       focus: onFocus,
     });
     let $save = $('#save-dialog');
-    $save.find('.button').on({ click: () => {
+    $save.find('.button').on({ [tap]: () => {
       let key = $input.val();
       manager[0].save( key );
       enableSaveList();
+      $savelist.val( key );
       closeModal();
     }});
     $('#save-unit').addClass('save').on({
-      click: () => {
+      [tap]: () => {
         openModal( $save, () => 0 );
       }
     });
     let $info = $('#simple-dialog');
     let $text = $('#dialog-text');
     let $ok = $('#dialog-ok');
-    $info.find('.button').on({click: closeModal});
+    $info.find('.button').on({[tap]: closeModal});
 
     $savelist.on({
       change: () => {
@@ -914,11 +941,11 @@ var pline = function( text ){
         $delete.removeClass('no-data');
     };
     let $delete = $('#delete-unit').on({
-      click: () => {
+      [tap]: () => {
         let $selected = $savelist.find('option:selected');
         let key = $selected.text();
         $text.text(`本当に[${key}]を削除してもよろしいですか？`);
-        $ok.off('.delete').on( 'click.delete', () => {
+        $ok.off('.delete').on( tap+'.delete', () => {
           pline(`[${key}]を削除しました。`)
           deleteSave( key, $selected );
         });
@@ -926,32 +953,41 @@ var pline = function( text ){
       }
     });
   } //セーブ関連ブロック
+  //メモ機能
+  {
+    let $memo = $('#memo');
+    let $text = $memo.find('textarea');
+    let onFocus = () => {
+      $text.off('.initial').empty();
+    };
+    let saved = window.localStorage.getItem('memo');
+    if ( !saved ) {
+      $text.text(
+        '簡易メモです。\n' +
+        'このページを閉じると保存されていない内容は失われます。\n' +
+        '単色構成支配人の名前を記録するのに使うといいんじゃないですかね。'
+      ).on({
+        [tap + '.initial']: onFocus,
+        'focus.initial': onFocus,
+      });
+    } else {
+      $text.val( saved );
+    }
+    $('#open-memo').on({ [tap]: () => {
+      openModal( $memo, ()=>0 );
+    }});
+    $('#save-memo').on({ [tap]: () => {
+      if ( !$text.val() || !window.localStorage ) return false;
+      window.localStorage.setItem( 'memo', $text.val() );
+      pline('メモの内容をブラウザに保存しました。');
+    }});
+    $('#delete-memo').on({ [tap]: () => {
+      $text.val('').empty();
+    }});
+  } //メモ機能ブロック
 } //モーダル関連ブロック
 
-//メモ機能
-{
-  let n = 0;
-  let $memo = $('.memo').clone().removeClass('template');
-  $('.memo').remove();
-  let onFocus = function(){
-    let $this = $(this);
-    $this.off('.initial').empty();
-  };
-  $memo.find('textarea').text(
-    '簡易メモです。\n' +
-    'このページを閉じると内容は失われます。\n' +
-    '単色構成のユーザー名の記録などに使うと便利だと思います。'
-  ).on({
-    'click.initial': onFocus,
-    'focus.initial': onFocus,
-  });
-  $('#open-memo').on({ click: () => {
-    n++;
-    let $close = $('<div>').addClass('close-button').on({click: () => { $('#memo-'+n).remove(); } }).text('×');
-    $memo.clone(true).appendTo($body).attr({id: `memo-${n}`}).draggable()
-      .append( $close ).find('h2').text(`Note ${n}`);
-  }});
-}
+
 
 //初期化処理
 Promise.resolve(0).then( () => {
@@ -971,6 +1007,7 @@ Promise.resolve(0).then( () => {
     let slot = window.localStorage.getItem( 'default_unit' );
     if ( ( slot !== void 0 ) && unitSaveSlot[slot] ) {
       manager[0].load(slot);
+      $savelist.val( slot );
     }
   }
 }).catch( e => {
