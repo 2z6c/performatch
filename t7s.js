@@ -430,7 +430,12 @@ var selectType = function( e, callback, withNT ) {
   var qType = withNT ? 6 : 5;
   $('.type-select').remove();
   $cell.removeClass( 'selecting' );
-  var $list = $('<ul>').addClass('type-select').appendTo( $body ).css({top: e.pageY, left: e.pageX});
+  let $list = $('<ul>').addClass('type-select').appendTo( $body ).css({
+    top: e.pageY,
+    left: e.pageX
+  }).delay(200).queue( next => {
+    $list.addClass('stable');
+  });
   for ( let i = 0; i < qType; i++ ) {
     let $li = $('<a>').text( type[i].tag ).addClass( type[i].tag ).attr({title:type[i].name});
     $li.on({

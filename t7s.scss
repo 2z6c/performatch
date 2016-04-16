@@ -239,6 +239,8 @@ h1 {
     width: 32px;
     height: 32px;
     border-style: dashed;
+  }
+  .stable &:after {
     animation: spin 10s linear infinite;
   }
 }
