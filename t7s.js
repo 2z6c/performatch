@@ -26,6 +26,7 @@ var $config = $('#config');
 var $cell = $('.unit td');
 var $manager = $('.unit');
 var $result = $('#result-table tbody');
+var $resultArea = $('#result');
 var $known = $('#known-unit-wrapper');
 var $you = $('#you');
 var $rival = $('#rival');
@@ -530,6 +531,8 @@ $body.on({ [tap]: closeSelect });
       }).then( () => {
         $progress.fadeOut();
         $bar.fadeOut();
+        var position = $resultArea.offset().top;
+        $body.animate({scrollTop:position});
       });
     }
   });
